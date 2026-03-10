@@ -195,10 +195,12 @@
     </div>
 
     <nav class="nav">
-        <div class="nav-brand">RProDash</div>
+        <div class="nav-brand" style="cursor:pointer;"
+            onclick="sessionStorage.removeItem('rprodash_advisor'); window.location.href='index.html'">RProDash</div>
         <div class="nav-actions">
             <div class="tabs" id="mainTabs">
-                <button class="tab active" data-panel="panelResumen" onclick="switchTab(this)"> Resumen</button>
+                <button id="tabViewName" class="tab active" data-panel="panelResumen" onclick="switchTab(this)">
+                    Resumen</button>
                 <button class="tab" data-panel="panelGraficas" onclick="switchTab(this)"> Gráficas</button>
                 <button class="tab" data-panel="panelMapa" onclick="switchTab(this)"> Mapa</button>
                 <button class="tab" data-panel="panelExcel" onclick="switchTab(this)"> Excel</button>

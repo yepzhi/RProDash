@@ -127,6 +127,7 @@
         function submitPin() {
             const pin = document.getElementById('pinInput').value;
             if (authenticate(pin)) {
+                sessionStorage.removeItem('rprodash_advisor'); // Ensure clean start at Global View
                 const next = new URLSearchParams(window.location.search).get('next');
                 window.location.href = next || 'index.html';
             } else {

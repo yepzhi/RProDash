@@ -267,10 +267,11 @@
   <canvas id="particleCanvas"></canvas>
 
   <nav class="top-nav">
-    <div class="brand">RProDash</div>
+    <div class="brand" style="cursor:pointer;"
+      onclick="sessionStorage.removeItem('rprodash_advisor'); window.location.reload();">RProDash</div>
     <div class="nav-right" style="display:flex; gap:10px; align-items:center;">
       <div class="tabs" style="margin-right:12px">
-        <button class="tab active" style="cursor:default">Resumen</button>
+        <button id="tabViewName" class="tab active" style="cursor:default">Visión Global</button>
         <button class="tab" onclick="window.location.href='dashboard.html?tab=panelGraficas'">Gráficas</button>
         <button class="tab" onclick="window.location.href='dashboard.html?tab=panelMapa'">Mapa</button>
         <button class="tab" onclick="window.location.href='dashboard.html?tab=panelExcel'">Excel</button>
@@ -435,6 +436,9 @@
 
         const all = getSchools();
         currentSchoolsData = name === 'GLOBAL' ? all : all.filter(s => s.asesor === name);
+
+        const topTab = document.getElementById('tabViewName');
+        if (topTab) topTab.textContent = name === 'GLOBAL' ? 'Visión Global' : name;
 
         // Header UI
         if (name === 'GLOBAL') {

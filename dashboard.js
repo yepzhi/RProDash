@@ -21,6 +21,11 @@ async function boot() {
         badge.innerHTML = `<span class="advisor-dot" style="background:var(--accent-2)"></span>Vista Global`;
     }
 
+    const tabEl = document.getElementById('tabViewName');
+    if (tabEl) {
+        tabEl.textContent = advisor ? advisor : 'Visión Global';
+    }
+
     allSchools = await getSchoolsAsync();
     filteredSchools = [...allSchools];
 
