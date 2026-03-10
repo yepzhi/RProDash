@@ -13,12 +13,12 @@ function boot() {
     const advisor = getCurrentAdvisor();
     const color = advisor ? advisorColor(advisor) : '#0a84ff';
 
-    // Nav badge
+    // Nav badge — shows current advisor or global label
     const badge = document.getElementById('navAdvisorBadge');
     if (advisor) {
         badge.innerHTML = `<span class="advisor-dot" style="background:${color}"></span>${advisor}`;
     } else {
-        badge.textContent = 'Seleccionar asesor';
+        badge.innerHTML = `<span class="advisor-dot" style="background:var(--accent-2)"></span>Vista Global`;
     }
 
     allSchools = getSchools();
@@ -59,9 +59,7 @@ function buildFilterOptions() {
         etapaSel.appendChild(o);
     });
 
-    // Pre-select current advisor
-    const cur = getCurrentAdvisor();
-    if (cur) asesorSel.value = cur;
+    // Default to global view — no advisor pre-selected
     applyFilters();
 }
 
