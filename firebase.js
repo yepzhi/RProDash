@@ -22,12 +22,13 @@
    ===================================================== */
 
 const FIREBASE_CONFIG = {
-    apiKey: "PEGA_TU_API_KEY_AQUI",
-    authDomain: "PEGA_TU_AUTH_DOMAIN_AQUI",
-    projectId: "PEGA_TU_PROJECT_ID_AQUI",
-    storageBucket: "PEGA_TU_STORAGE_BUCKET_AQUI",
-    messagingSenderId: "PEGA_TU_MESSAGING_SENDER_ID_AQUI",
-    appId: "PEGA_TU_APP_ID_AQUI"
+  apiKey: "AIzaSyCCyhX69gadotGWr_ahCSZbRF7CAdeMe1E",
+  authDomain: "rprodash.firebaseapp.com",
+  projectId: "rprodash",
+  storageBucket: "rprodash.firebasestorage.app",
+  messagingSenderId: "116659616322",
+  appId: "1:116659616322:web:a422259da3034e71654bdb",
+  measurementId: "G-5HKYZZNL65"
 };
 
 // ── Firebase ready flag ──
@@ -37,13 +38,13 @@ const FIREBASE_READY = !Object.values(FIREBASE_CONFIG).some(v => v.startsWith('P
 let db = null;
 
 if (FIREBASE_READY) {
-    try {
-        if (!firebase.apps?.length) firebase.initializeApp(FIREBASE_CONFIG);
-        db = firebase.firestore();
-        console.info('[RProDash] ✅ Firebase conectado a proyecto:', FIREBASE_CONFIG.projectId);
-    } catch (e) {
-        console.warn('[RProDash] ⚠️ Firebase error, usando localStorage:', e.message);
-    }
+  try {
+    if (!firebase.apps?.length) firebase.initializeApp(FIREBASE_CONFIG);
+    db = firebase.firestore();
+    console.info('[RProDash] ✅ Firebase conectado a proyecto:', FIREBASE_CONFIG.projectId);
+  } catch (e) {
+    console.warn('[RProDash] ⚠️ Firebase error, usando localStorage:', e.message);
+  }
 } else {
-    console.info('[RProDash] 📦 Modo local (localStorage). Configura firebase.js para sincronizar en la nube.');
+  console.info('[RProDash] 📦 Modo local (localStorage). Configura firebase.js para sincronizar en la nube.');
 }
