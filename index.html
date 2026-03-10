@@ -49,6 +49,9 @@
             letter-spacing: 0.8px;
             color: var(--text-3);
             margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .advisor-grid-home {
@@ -81,6 +84,17 @@
             border-color: var(--tile-color, #0a84ff);
             background: rgba(var(--tile-rgb, 10, 132, 255), 0.1);
             box-shadow: 0 0 0 1.5px var(--tile-color, #0a84ff);
+        }
+
+        /* Global Tile special styles */
+        .advisor-tile.global-tile {
+            background: linear-gradient(135deg, rgba(10, 132, 255, 0.08), rgba(48, 209, 88, 0.05));
+        }
+
+        .advisor-tile.global-tile.selected {
+            background: linear-gradient(135deg, rgba(10, 132, 255, 0.15), rgba(48, 209, 88, 0.12));
+            border-color: #30d158;
+            box-shadow: 0 0 0 1.5px #30d158;
         }
 
         /* Photo circle */
@@ -117,7 +131,7 @@
             display: none;
         }
 
-        .advisor-tile:hover .upload-photo-hint {
+        .advisor-tile:not(.global-tile):hover .upload-photo-hint {
             display: block;
         }
 
@@ -130,49 +144,6 @@
         .tile-count {
             font-size: 11px;
             color: var(--text-3);
-        }
-
-        /* ── Global Button ── */
-        .global-btn {
-            margin: 20px 24px 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: linear-gradient(135deg, rgba(10, 132, 255, 0.12), rgba(48, 209, 88, 0.08));
-            border: 1px solid rgba(10, 132, 255, 0.3);
-            border-radius: 14px;
-            padding: 14px 20px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .global-btn:hover {
-            background: linear-gradient(135deg, rgba(10, 132, 255, 0.2), rgba(48, 209, 88, 0.14));
-        }
-
-        .global-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #0a84ff, #30d158);
-            flex-shrink: 0;
-        }
-
-        .global-label {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text);
-        }
-
-        .global-sub {
-            font-size: 12px;
-            color: var(--text-2);
-        }
-
-        .global-arrow {
-            margin-left: auto;
-            color: var(--text-3);
-            font-size: 16px;
         }
 
         /* ── Inline panel ── */
@@ -188,8 +159,14 @@
         .advisor-header {
             display: flex;
             align-items: center;
-            gap: 16px;
+            justify-content: space-between;
             padding: 0 24px;
+        }
+
+        .advisor-header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
 
         .advisor-avatar-sm {
@@ -236,6 +213,36 @@
             margin-bottom: 10px;
         }
 
+        /* Sortable Headers */
+        th.sortable {
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.2s;
+        }
+
+        th.sortable:hover {
+            color: var(--text);
+        }
+
+        th.sortable::after {
+            content: '↕';
+            margin-left: 6px;
+            opacity: 0.3;
+            font-size: 10px;
+        }
+
+        th.sortable.asc::after {
+            content: '↑';
+            opacity: 1;
+            color: var(--accent);
+        }
+
+        th.sortable.desc::after {
+            content: '↓';
+            opacity: 1;
+            color: var(--accent);
+        }
+
         @media(max-width:600px) {
             .advisor-grid-home {
                 grid-template-columns: repeat(3, 1fr);
@@ -267,47 +274,47 @@
         </div>
     </nav>
 
-    <!-- Always-visible Datos Globales button -->
-    <div class="global-btn" onclick="window.location.href='dashboard.html'">
-        <div class="global-dot"></div>
-        <div>
-            <div class="global-label">Datos Globales</div>
-            <div class="global-sub">Vista general · todos los asesores</div>
-        </div>
-        <div class="global-arrow">→</div>
-    </div>
-
     <!-- Advisor picker -->
     <div class="advisor-section">
-        <div class="section-eyebrow">Selecciona tu perfil</div>
-        <div class="advisor-grid-home" id="advisorGrid"></div>
+        <div class="section-eyebrow">
+            <span>Selecciona tu perfil o vista</span>
+        </div>
+        <div class="advisor-grid-home" id="advisorGrid">
+            <!-- JS injects tiles here, including Global -->
+        </div>
     </div>
 
     <!-- Inline KPI panel -->
     <div class="dash-panel" id="dashPanel">
         <div class="advisor-header" id="advisorHeader"></div>
-        <div class="quick-actions">
-            <a href="capture.html" class="btn btn-primary" style="font-size:14px">+ Capturar oportunidad / usuario</a>
-            <a id="profileBtn" href="profile.html" class="btn btn-secondary" style="font-size:14px">Ver perfil
-                completo</a>
+        <div class="quick-actions" id="quickActions">
+            <a href="capture.html" class="btn btn-primary" style="font-size:14px">+ Nueva Captura</a>
+            <a id="profileBtn" href="profile.html" class="btn btn-secondary" style="font-size:14px"
+                style="display:none">Ver mi perfil</a>
+            <a id="dashboardBtn" href="dashboard.html" class="btn btn-secondary" style="font-size:14px"
+                style="display:none">Dashboard Completo</a>
         </div>
         <div style="padding:20px 24px 0">
             <div class="section-label">Resumen</div>
             <div class="kpi-grid" id="miniKpi"></div>
         </div>
         <div class="recent-table">
-            <div class="section-label">Últimas escuelas</div>
+            <div class="section-label">Base de Datos</div>
             <div class="table-glass">
                 <div class="table-wrapper">
                     <table class="data-table">
                         <thead>
-                            <tr>
-                                <th>Escuela</th>
-                                <th>Tipo</th>
-                                <th>Etapa</th>
-                                <th>Alumnos/Per.</th>
-                                <th>Venta Proy.</th>
-                                <th>Actualizado</th>
+                            <tr id="tableHeaders">
+                                <th class="sortable" data-col="nombre">Escuela</th>
+                                <th class="sortable" data-col="asesor">Asesor</th>
+                                <th class="sortable" data-col="tipo">Tipo</th>
+                                <th class="sortable" data-col="etapa">Etapa</th>
+                                <th class="sortable" data-col="alumnos_periodo" style="text-align:right">Alumnos/Per.
+                                </th>
+                                <th class="sortable" data-col="precio" style="text-align:right">Precio Neto</th>
+                                <th class="sortable" data-col="venta_proy" style="text-align:right">Venta Proy.</th>
+                                <th class="sortable" data-col="canal">Canal</th>
+                                <th class="sortable" data-col="updatedAt">Actualizado</th>
                             </tr>
                         </thead>
                         <tbody id="recentBody"></tbody>
@@ -326,49 +333,65 @@
 
     <script src="app.js"></script>
     <script>
-    if (        uireAuth()) {}
+         f (!requireAuth()) {}
 
-    let selectedAdvisor = getCurrent        sor() || null;
-    let pendin        toFor  = null;
+    let selectedAdvisor = get        entAdvisor() || 'GLOBAL';
+            pendingPhotoFor  = null;
+    let currentSchoolsData =         // holds data for sorting
+               // Sort State
+    let sortCol = 'updatedAt';
+    let sortAs            lse;
 
-    // Build advisor grid
-    const gri        document.getElementById('ad            rid');
-    ADVISORS.forEach(name => {
-      const schools = g            ols().filter(s => s.asesor === nam                const color   = advisorColor(name);
-            const initial = ADVISOR_INITIALS[name];
-                t photo   = getAdvisorPhoto(name);
+    // Build grid (Global +             rs)
+    const grid = document.getElement            advisorGrid');
+    
+    // 1. Add Global Til            const allSch = getSchools();
+    const globalTile = document.createElement('div              globalTile.className = 'advisor-tile global-t             (selectedAdvisor === 'GLOBAL' ? ' selected' : '');
+    globalTile.id = 'tile_GLOBAL';
+    globalTile.innerHTML = `
+      <div class="advisor-initial-circle" style="ba            nd:linear-gradient(135deg,rgba(10,132,255,0.2),rgba(48,209,            ));border:2px solid rgba(4            88,0.5);color:#30d158">🌍        v>
+          <div class="tile-name">Visión Global</div>
+          <div class="tile-count">${allS            gth} escuelas</div>
+                 globalTile.addEventListen            ick', () => selectAdvisor('GL            );
+    grid.appendChild(globalTile);
 
-      const tile = document.createElement('            
-      tile.className = 'advisor-tile' + (selec            isor === name ? ' selected' : '');
-      tile.style.setProperty('--tile-color', color);
+    // 2. Add Advisor Tiles
+    ADVISORS.forEach(            > {
+      const schools = allSch.filter(s => s.asesor === na                 const color   = advisorColor(name);
+      const             l = ADVISOR_INITIALS[name];
+                  photo   = getAdvisorPhoto(name);
+
+                  tile = document.createElement('div');
+      tile.className = '            r-tile' + (selectedAdviso            name ? ' selected' : '');
+      tile.style.setProperty('--tile-            , color);
       tile.id = 'tile_' + name;
 
-      const avatarHtml = photo
-        ? `<img            ${photo}" class="advisor-photo-circle" style="border:2px so            color}66" alt="${name}">`
-              : `<div class="advisor-        ial-c        e" style="background:linear-gradient(135deg,        lor}77,${color}22);border:2px s            {color}44;color:${color}            itial}</div>`;
+      const avatarHtm            oto
+        ? `<img src="${photo}"            ="advisor-photo-circle" style="border:2px solid ${color}66" a            name}">`
+        : `<div class="advisor-initial-circle" style="background:linear-gradient(135deg,            r}77,${color}22);border:2px solid ${color}44;color:${color            nitial}</div>`;
 
-      tile            HTML = `
-        ${avatarHtml                <div class="tile-name">${name}</div>
-        <div class="tile-count">${schools.leng            cuela${schools.length !== 1 ? 's' : ''}</div>
-        <div c            upload-photo-hint">Cambiar foto</div>
+             ile.innerHTML = `
+        ${avatarHtml}
+        <div class="tile-name">${name}</div>
+        <div class="tile-count">${schools.length} escuela${schools.length !== 1 ? 's' : ''}</div>
+        <div class="upload-photo-hint">Cambiar foto</div>
       `;
 
-                 addEventListener('click', () => se            visor(name));
-      tile.addEventListene            textmenu', e => {
+      tile.addEventListener('click', () => selectAdvisor(name));
+      tile.addEventListener('contextmenu', e => {
         e.preventDefault();
-        pendingP            r = name;
-        documen            lementById('photoInput').click();
+        pendingPhotoFor = name;
+        document.getE            ById('ph            ut').click();
       });
-      grid.appendCh            le);
+      grid.appendChild(tile);
     });
 
-    // Photo upload handler
-    document.getElemen            'photoInput').addEventListener('ch             function() {
-      if (!this.files[0] || !pendingPhotoFor) r            
-      const reader = new FileReader();
-      reader.onload = e => {
-        saveAdvisorPhoto(pen            otoFor, e.target.result);
-        // Refresh that tile's i                   const tile             ment.getElementById('tile_' + pendingPhotoFor);
+    // Photo uplo            dler
+    documen etElementById('photoInput').addEventListener('change', func             {
+      if (!th files[0] || !pendingPhotoFor) return;
+      const read            ew FileReader(     reader.onload = e => {
+        saveAdvisorPhoto(            gPhotoFor, e.target.result);
+        const tile = document.getElementById('tile_' + pendingPhotoFor);
         if (tile) {
           const img = tile.querySelector('.advisor-photo-circle, .advisor-initial-circle');
           if (img) {
@@ -376,64 +399,133 @@
           }
         }
         pendingPhotoFor = null;
+        if(selectedAdvisor !== 'GLOBAL') selectAdvisor(selectedAdvisor); // re-render header
       };
-      reader.readAsDataURL(            iles[0])              this.value = '';
+      reader.readAsDataURL(this.files[0]);
+      this.value = '';
     });
 
-    function selectAdvisor(name) {
-      selectedAdv             name;
-      set rentAdvisor(name);
-      document.querySelectorAll('.adviso            ').forEach(t =>  lassList.remove('selected'));
-      const tile = docum            tElementById(' ' + name);
-      if (tile) tile.classList.add('selec            
+    function selectA            (name) {
+      selec            isor = name;
+      if (name !== 'GLO BAL') setCurrentAd vi sor(name);
+      
+      docum en t.querySelectorAll            isor-tile').forEach(t => t.classList.remove('selected                 const tile = docu                ElementById('tile_' + name);
+      if (tile) tile.classList.add('selected');
 
-      const color   = advisorColor(name);
-      const initial = ADVISOR_INITIALS[name];
-      const schools = getSchools().filter(s => s.asesor === name);
-      const photo   = getAdvisorPhoto(name);
+      document.getElementById('dashPanel').classList.add('vis            ;
 
-      document.getElementById('profileBtn').href = `profile.html?advisor=${encodeURIComponent(name)}`;
-      document.getElementById('dashPanel').classList.add('visible');
+                      l = getSchools();
+      currentSchoo                    ame === 'GLOBAL' ? all : all.filter(s => s.                     name);
 
-      const avatarHtml = photo
-        ? `<img src="${photo}" class="advisor-photo-circle" style="width:52px;height:52px;border:2px solid ${color}66" alt="${name}">`
-        : `<div class="advisor-avatar-sm" style="background:linear-gradient(135deg,${color}77,${color}22);border:2px sol            olor}44;color:${colo            initial}</div>`;
+      // Header UI
+      if (name === 'GLOBAL') {
+        document.getElementById('profileBtn').style. dis play = 'n o ne';
+          document.getElementById(' das hboardBtn ' ).style.d i splay = 'inline-flex';
+        document.getElementById('advisorHeader').innerHTML = `
+          <div class="advisor-header-l ef t">
+            <div class="advisor-avatar-sm" style="background:linear-gradient(135deg,rgba(10,132,255,0.2),rgba(48,209,88,0.2));border:2px solid rgba(48,209,88,0.5);color:#30d158">🌍</div>
+            <div>
+              <div class="advisor-name-lg">Visión Global</div>
+              <div class="advisor-meta-sm">Todas las escuel                 red</div>
+                        div                </div>
+                       } else {
+          const color    = advisorColor(name); 
+        const initia l = ADVIS        NIT        [name];
+        const photo   = getAdvisorPhoto(name);
+            
+        document.getElementById('profileBtn').href         profile.html?advisor=\${encodeURIComponent(ne)}     document.getElementById('profileBtn').style.display = 'inline-flex';
+        document.getElementById('dashboardBtn').style.display = 'none';
 
-      document.get ElementById('advis or Header').innerHTML = `
-          ${avatarHtml}
-                iv>
-          <div class="advisor-name-lg">${name}</d                    <div class="ad                ta-sm">${schools.length} escuela${schools.length !== 1 ? 's' : ''} capturadas</div>
-        </div>
+        const avatarHtml = photo
+          ? `<img src="${photo}" class="advisor-photo-circle" style="width:52px;height:52px;border:2px solid ${color}66" alt="${name}">`
+          : `<div class="advisor-avatar-sm" style="background:linear-gradient(135deg,${color}77,${color}22);border:2px solid ${color}44;color:${color}">${initial}</div>`;
+
+        document.getElementById('advisorHeader').innerHTML = `
+          <div class="advisor-header-left">
+            ${avatarHtml}
+            <div>
+              <div class="advisor-name-lg">${name}</div>
+              <div class="advisor-meta-sm">${currentSchoolsData.length} escuela${currentSchoolsData.length !== 1 ? 's' : ''} capturadas</div>
+            </div>
+          </div>
+        `;
+      }
+
+      // KPIs
+      const totalAlumnos = currentSchoolsData.reduce((a,x) => a + (x.alumnos_periodo||0), 0);
+      const totalVenta   = currentSchoolsData.reduce((a,x) => a + calcVentaProyectada(x), 0);
+      const conquistas   = currentSchoolsData.filter(x => x.tipo === 'conquista').length;
+      const usuarios     = currentSchoolsData.filter(x => x.tipo === 'usuario').length;
+      
+      document.getElementById('miniKpi').innerHTML = `
+        <div class="kpi-card"><div class="kpi-label">Escuelas</div><div class="kpi-value">${currentSchoolsData.length}</div><div class="kpi-sub">${usuarios} usuarios · ${conquistas} conquistas</div></div>
+        <div class="kpi-card"><div class="kpi-label">Alumnos / Periodo</div><div class="kpi-value">${formatNumber(totalAlumnos)}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Venta proyectada</div><div class="kpi-value" style="font-size:1.5em">${formatCurrency(totalVenta)}</div></div>
       `;
 
-      const totalAlumnos = sch            educe((a,                + (x.alumnos_periodo||0), 0);
-                          lVenta   = schools.reduce((a,x) => a + calc                    ctada(x), 0);
-      const conquistas   = schools.filter(x => x.tipo === 'conquista').length;
-      const usuari os      = sch o ols.filter(x   => x.tipo === 'usuario'). len gth;
-        document . getElementById('miniKpi').innerHTML = `
-        <div class="kpi-card"><div class="kpi-label">Escuelas</div><div class="kpi-v al ue">${schools.length}</div><div class="kpi-sub">${usuarios} usuarios · ${conquistas} conquistas</div></div>
-        <div class="kpi-card"><div class="kpi-label">Alumnos / Periodo</div><div class="kpi-value">${formatNumber(totalAlumnos)}</div></div>
-        <div class="kpi-card"><div class="kpi-label">Venta proyectada</div><div cl                -value" style            -s        1.5        ${formatCurrency(tot            a)}</div></div>
-        `;
-
-      cons t recent = [...schools ].sort((a,b) => (b.up datedAt||        loc        ompare(a.updatedAt||'')).slice(0,8);
-      const tbody  =         ment.getElementById('recentBody');
-      tbody.innerH        = !recent.length
-        ? `<tr><td colspan=" sext-align:center;padding:30px;color:var(--text-3)">Sin escuelas capturadas aún.</td></tr>`
-        : recent.map(s => {
-            const et = etapaColor(s.etapa||'');
-            return `<tr>
-              <td><strong>${esc(s.nombre)}</strong></td>
-              <td><span class="badge ${s.tipo==='usuario'?'badge-blue':'badge-orange'}">${s.tipo==='usuario'?'Usuario':'Conquista'}</span></td>
-              <td><span class="badge" style="background:${et}22;color:${et}">${esc(s.etapa)||'—'}</span></td>
-              <td style="text-align:right">${formatNumber(s.alumnos_periodo)}</td>
-              <td style="text-align:right;font-weight:700;color:var(--accent)">${formatCurrency(calcVentaProyectada(s))}</td>
-              <td style="color:var(--text-3);font-size:12px">${formatDate(s.updatedAt)}</td>
-            </tr>`;
-          }).join('');
-
-      // Scroll to panel
+      renderTable();
       document.getElementById('dashPanel').scrollIntoView({ behavior:'smooth', block:'start' });
+    }
+
+    // Sorting Logic
+    document.querySelectorAll('th.sortable').forEach(th => {
+      th.addEventListener('click', () => {
+        const col = th.dataset.col;
+        if (sortCol === col) {
+          sortAsc = !sortAsc;
+        } else {
+          sortCol = col;
+          sortAsc = true;
+        }
+        
+        // Update header classes
+        document.querySelectorAll('th.sortable').forEach(el => el.classList.remove('asc', 'desc'));
+        th.classList.add(sortAsc ? 'asc' : 'desc');
+        
+        renderTable();
+      });
+    });
+
+    function renderTable() {
+      const tbody = document.getElementById('recentBody');
+      if (!currentSchoolsData.length) {
+        tbody.innerHTML = \`<tr><td colspan="9" style="text-align:center;padding:30px;color:var(--text-3)">Sin escuelas capturadas aún.</td></tr>\`;
+        return;
+      }
+
+      // Sort
+      const sorted = [...currentSchoolsData].sort((a,b) => {
+        let vA, vB;
+        switch(sortCol) {
+          case 'nombre': vA = (a.nombre||'').toLowerCase(); vB = (b.nombre||'').toLowerCase(); break;
+          case 'asesor': vA = (a.asesor||'').toLowerCase(); vB = (b.asesor||'').toLowerCase(); break;
+          case 'tipo': vA = (a.tipo||''); vB = (b.tipo||''); break;
+          case 'etapa': vA = (a.etapa||''); vB = (b.etapa||''); break;
+          case 'alumnos_periodo': vA = a.alumnos_periodo||0; vB = b.alumnos_periodo||0; break;
+          case 'precio': vA = a.precioNeto||0; vB = b.precioNeto||0; break;
+          case 'venta_proy': vA = calcVentaProyectada(a); vB = calcVentaProyectada(b); break;
+          case 'canal': vA = (a.distribuidor||'').toLowerCase(); vB = (b.distribuidor||'').toLowerCase(); break;
+          case 'updatedAt': default: vA = a.updatedAt||''; vB = b.updatedAt||''; break;
+        }
+        if (vA < vB) return sortAsc ? -1 : 1;
+        if (vA > vB) return sortAsc ? 1 : -1;
+        return 0;
+      });
+
+      tbody.innerHTML = sorted.map(s => {
+        const et = etapaColor(s.etapa||'');
+        return \`<tr>
+          <td><strong>\${esc(s.nombre)}</strong></td>
+          <td>\${esc(s.asesor)}</td>
+          <td><span class="badge \${s.tipo==='usuario'?'badge-blue':'badge-orange'}">\${s.tipo==='usuario'?'Usuario':'Conquista'}</span></td>
+          <td><span class="badge" style="background:\${et}22;color:\${et}">\${esc(s.etapa)||'—'}</span></td>
+          <td style="text-align:right">\${formatNumber(s.alumnos_periodo)}</td>
+          <td style="text-align:right">\${formatCurrency(s.precioNeto)}</td>
+          <td style="text-align:right;font-weight:700;color:var(--accent)">\${formatCurrency(calcVentaProyectada(s))}</td>
+          <td style="text-transform:capitalize">\${esc(s.distribuidor)}</td>
+          <td style="color:var(--text-3);font-size:12px">\${formatDate(s.updatedAt)}</td>
+        </tr>\`;
+      }).join('');
     }
 
     function esc(str) { return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
