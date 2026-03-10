@@ -137,9 +137,12 @@
 <body>
     <canvas id="particleCanvas"></canvas>
     <nav class="nav">
-        <div class="nav-brand">RProDash</div>
+        <div class="nav-brand" style="cursor:pointer;"
+            onclick="sessionStorage.removeItem('rprodash_advisor'); window.location.href='index.html'">RProDash</div>
         <div class="nav-actions">
-            <a href="index.html" class="btn btn-secondary" style="font-size:13px;">Inicio</a>
+            <button class="btn btn-secondary"
+                onclick="sessionStorage.removeItem('rprodash_advisor'); window.location.href='index.html'"
+                style="font-size:13px;">Visión Global</button>
             <a href="dashboard.html" class="btn btn-secondary" style="font-size:13px;">Dashboard</a>
             <button class="btn btn-secondary" onclick="sessionStorage.clear();window.location.href='login.html'"
                 style="font-size:12px">Salir</button>

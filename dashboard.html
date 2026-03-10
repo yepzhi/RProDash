@@ -208,7 +208,9 @@
             </div>
             <div id="navAdvisorBadge" class="nav-advisor" style="cursor:pointer;"
                 onclick="window.location.href='index.html'" title="Cambiar asesor"></div>
-            <a href="index.html" class="btn btn-secondary" style="font-size:12px;">Inicio</a>
+            <button class="btn btn-secondary"
+                onclick="sessionStorage.removeItem('rprodash_advisor'); window.location.href='index.html'"
+                style="font-size:12px;">Visión Global</button>
             <button class="btn btn-secondary" onclick="sessionStorage.clear();window.location.href='login.html'"
                 style="font-size:12px">Salir</button>
         </div>
