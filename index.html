@@ -334,9 +334,6 @@
   <!-- FAB -->
   <a href="capture.html" class="fab" title="Nueva captura">+ Nueva Captura</a>
 
-  <!-- Hidden photo upload input -->
-  <input type="file" id="photoInput" accept="image/*" style="display:none">
-
   <script src="app.js"></script>
   <script>
     if (!requireAuth()) {
@@ -344,7 +341,6 @@
     }
 
     let selectedAdvisor = getCurrentAdvisor() || 'GLOBAL';
-    let pendingPhotoFor = null;
     let currentSchoolsData = []; // holds data for sorting
     let allSch = []; // global cache
 
@@ -378,49 +374,22 @@
         const schools = allSch.filter(s => s.asesor === name);
         const color = advisorColor(name);
         const initial = ADVISOR_INITIALS[name];
-        const photo = getAdvisorPhoto(name);
 
         const tile = document.createElement('div');
         tile.className = 'advisor-tile' + (selectedAdvisor === name ? ' selected' : '');
         tile.style.setProperty('--tile-color', color);
         tile.id = 'tile_' + name;
 
-        const avatarHtml = photo
-          ? `<img src="${photo}" class="advisor-photo-circle" style="border:2px solid ${color}66" alt="${name}">`
-          : `<div class="advisor-initial-circle" style="background:linear-gradient(135deg,${color}77,${color}22);border:2px solid ${color}44;color:${color}">${initial}</div>`;
+        const avatarHtml = `<div class="advisor-initial-circle" style="background:linear-gradient(135deg,${color}77,${color}22);border:2px solid ${color}44;color:${color}">${initial}</div>`;
 
         tile.innerHTML = `
         ${avatarHtml}
         <div class="tile-name">${name}</div>
         <div class="tile-count">${schools.length} escuela${schools.length !== 1 ? 's' : ''}</div>
-        <div class="upload-photo-hint">Cambiar foto</div>
       `;
 
         tile.addEventListener('click', () => selectAdvisor(name));
-        tile.addEventListener('contextmenu', e => {
-          e.preventDefault();
-          pendingPhotoFor = name;
-          document.getElementById('photoInput').click();
-        });
         grid.appendChild(tile);
-      });
-
-      // Photo upload handler
-      document.getElementById('photoInput').addEventListener('change', function () {
-        if (!this.files[0] || !pendingPhotoFor) return;
-        resizeImageFile(this.files[0], 300, (base64) => {
-          saveAdvisorPhoto(pendingPhotoFor, base64);
-          const tile = document.getElementById('tile_' + pendingPhotoFor);
-          if (tile) {
-            const img = tile.querySelector('.advisor-photo-circle, .advisor-initial-circle');
-            if (img) {
-              img.outerHTML = `<img src="${base64}" class="advisor-photo-circle" style="border:2px solid ${advisorColor(pendingPhotoFor)}66" alt="${pendingPhotoFor}">`;
-            }
-          }
-          pendingPhotoFor = null;
-          if (selectedAdvisor !== 'GLOBAL') selectAdvisor(selectedAdvisor); // re-render header
-        });
-        this.value = '';
       });
 
       function selectAdvisor(name) {
@@ -455,15 +424,12 @@
         } else {
           const color = advisorColor(name);
           const initial = ADVISOR_INITIALS[name];
-          const photo = getAdvisorPhoto(name);
 
           document.getElementById('profileBtn').href = 'profile.html?advisor=' + encodeURIComponent(name);
           document.getElementById('profileBtn').style.display = 'inline-flex';
           document.getElementById('dashboardBtn').style.display = 'none';
 
-          const avatarHtml = photo
-            ? `<img src="${photo}" class="advisor-photo-circle" style="width:52px;height:52px;border:2px solid ${color}66" alt="${name}">`
-            : `<div class="advisor-avatar-sm" style="background:linear-gradient(135deg,${color}77,${color}22);border:2px solid ${color}44;color:${color}">${initial}</div>`;
+          const avatarHtml = `<div class="advisor-avatar-sm" style="background:linear-gradient(135deg,${color}77,${color}22);border:2px solid ${color}44;color:${color}">${initial}</div>`;
 
           document.getElementById('advisorHeader').innerHTML = `
           <div class="advisor-header-left">

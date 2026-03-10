@@ -30,19 +30,10 @@ async function boot() {
 
   // Avatar
   const av = document.getElementById('profileAvatar');
-  const photo = getAdvisorPhoto(advisor);
-
-  if (photo) {
-    av.style.background = 'transparent';
-    av.style.border = `2px solid ${color}66`;
-    av.textContent = '';
-    av.innerHTML = `<img src="${photo}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
-  } else {
-    av.style.background = `linear-gradient(135deg, ${color}88, ${color}33)`;
-    av.style.border = `2px solid ${color}66`;
-    av.style.color = color;
-    av.textContent = initial;
-  }
+  av.style.background = `linear-gradient(135deg, ${color}88, ${color}33)`;
+  av.style.border = `2px solid ${color}66`;
+  av.style.color = color;
+  av.textContent = initial;
 
   document.getElementById('profileName').textContent = advisor;
 
@@ -232,22 +223,6 @@ function saveStates() {
 
 function escapeHtml(str) {
   return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
-
-function handlePhotoUpload(input) {
-  const file = input.files[0];
-  if (!file) return;
-  resizeImageFile(file, 300, (base64) => {
-    saveAdvisorPhoto(advisor, base64);
-
-    const av = document.getElementById('profileAvatar');
-    const color = advisorColor(advisor);
-    av.style.background = 'transparent';
-    av.style.border = `2px solid ${color}66`;
-    av.textContent = '';
-    av.innerHTML = `<img src="${base64}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
-  });
-  input.value = '';
 }
 
 boot();
