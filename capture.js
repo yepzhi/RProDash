@@ -260,32 +260,39 @@ function prevStep() {
 
 function validateStep(step) {
   switch (step) {
-    case 0:
+    case 0: {
       const a = document.getElementById('f_asesor')?.value;
       if (!a) { alert('Selecciona un asesor.'); return false; }
       break;
-    case 1:
+    }
+    case 1: {
       const n = document.getElementById('f_nombre')?.value.trim();
       if (!n) { alert('Ingresa el nombre de la escuela.'); return false; }
       break;
-    case 2:
+    }
+    case 2: {
       if (!formData.tipo) { alert('Selecciona el tipo de escuela.'); return false; }
       break;
-    case 3:
+    }
+    case 3: {
       const e = document.getElementById('f_etapa')?.value;
       if (!e) { alert('Selecciona la etapa.'); return false; }
       break;
-    case 4:
+    }
+    case 4: {
       const al = document.getElementById('f_alumnos')?.value;
       if (!al || parseInt(al) <= 0) { alert('Ingresa un número válido de alumnos.'); return false; }
       break;
-    case 5:
+    }
+    case 5: {
       const p = document.getElementById('f_precio')?.value;
       if (!p || parseFloat(p) <= 0) { alert('Ingresa un precio neto válido.'); return false; }
       break;
+    }
   }
   return true;
 }
+
 
 function collectStep(step) {
   switch (step) {
