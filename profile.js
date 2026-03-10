@@ -114,8 +114,12 @@ function renderSchools() {
           </div>
         </div>
         <div style="display:flex;gap:8px;flex-shrink:0">
-          <button class="btn btn-secondary" style="font-size:12px;padding:7px 14px" onclick="editSchool('${s.id}')"> Editar</button>
-          <button class="btn btn-danger" style="font-size:12px;padding:7px 14px" onclick="confirmDelete('${s.id}')"></button>
+          <button class="btn btn-secondary btn-icon" title="Editar" onclick="editSchool('${s.id}')">
+            <svg style="width:16px;height:16px;opacity:0.8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+          </button>
+          <button class="btn btn-danger btn-icon" title="Eliminar" onclick="confirmDelete('${s.id}')">
+            <svg style="width:16px;height:16px;opacity:0.8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+          </button>
         </div>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:20px;font-size:13px;color:var(--text-2);margin-top:8px">

@@ -253,15 +253,16 @@
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>Escuela</th>
-                                    <th>Asesor</th>
-                                    <th>Tipo</th>
-                                    <th>Etapa</th>
-                                    <th>Alumnos/Per.</th>
-                                    <th>Precio neto</th>
-                                    <th>Venta proy.</th>
-                                    <th>Canal</th>
-                                    <th>Actualizado</th>
+                                    <th class="sortable" data-col="nombre">Escuela</th>
+                                    <th class="sortable" data-col="asesor">Asesor</th>
+                                    <th class="sortable" data-col="tipo">Tipo</th>
+                                    <th class="sortable" data-col="etapa">Etapa</th>
+                                    <th class="sortable" data-col="alumnos_periodo" style="text-align:right">
+                                        Alumnos/Per.</th>
+                                    <th class="sortable" data-col="precio" style="text-align:right">Precio Neto</th>
+                                    <th class="sortable" data-col="venta_proy" style="text-align:right">Venta Proy.</th>
+                                    <th class="sortable" data-col="canal">Canal</th>
+                                    <th class="sortable desc" data-col="updatedAt">Actualizado</th>
                                 </tr>
                             </thead>
                             <tbody id="tableBody"></tbody>

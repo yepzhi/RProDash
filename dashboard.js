@@ -138,7 +138,28 @@ function renderKPIs() {
   `;
 }
 
+// Sort State
+let sortCol = 'updatedAt';
+let sortAsc = false;
+
 // ── Table ──
+document.querySelectorAll('th.sortable').forEach(th => {
+    th.addEventListener('click', () => {
+        const col = th.dataset.col;
+        if (sortCol === col) {
+            sortAsc = !sortAsc;
+        } else {
+            sortCol = col;
+            sortAsc = true;
+        }
+
+        document.querySelectorAll('th.sortable').forEach(el => el.classList.remove('asc', 'desc'));
+        th.classList.add(sortAsc ? 'asc' : 'desc');
+
+        renderTable();
+    });
+});
+
 function renderTable() {
     const tbody = document.getElementById('tableBody');
     document.getElementById('countBadge').textContent = filteredSchools.length;
@@ -148,7 +169,26 @@ function renderTable() {
         return;
     }
 
-    tbody.innerHTML = filteredSchools.map(s => {
+    // Sort array before rendering
+    const sorted = [...filteredSchools].sort((a, b) => {
+        let vA, vB;
+        switch (sortCol) {
+            case 'nombre': vA = (a.nombre || '').toLowerCase(); vB = (b.nombre || '').toLowerCase(); break;
+            case 'asesor': vA = (a.asesor || '').toLowerCase(); vB = (b.asesor || '').toLowerCase(); break;
+            case 'tipo': vA = (a.tipo || ''); vB = (b.tipo || ''); break;
+            case 'etapa': vA = (a.etapa || ''); vB = (b.etapa || ''); break;
+            case 'alumnos_periodo': vA = a.alumnos_periodo || 0; vB = b.alumnos_periodo || 0; break;
+            case 'precio': vA = a.precioNeto || 0; vB = b.precioNeto || 0; break;
+            case 'venta_proy': vA = calcVentaProyectada(a); vB = calcVentaProyectada(b); break;
+            case 'canal': vA = (a.distribuidor || '').toLowerCase(); vB = (b.distribuidor || '').toLowerCase(); break;
+            case 'updatedAt': default: vA = a.updatedAt || ''; vB = b.updatedAt || ''; break;
+        }
+        if (vA < vB) return sortAsc ? -1 : 1;
+        if (vA > vB) return sortAsc ? 1 : -1;
+        return 0;
+    });
+
+    tbody.innerHTML = sorted.map(s => {
         const color = advisorColor(s.asesor);
         const etColor = etapaColor(s.etapa || '');
         const venta = calcVentaProyectada(s);

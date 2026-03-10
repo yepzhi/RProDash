@@ -374,6 +374,36 @@ body::before {
     white-space: nowrap;
 }
 
+.data-table th.sortable {
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.data-table th.sortable:hover {
+    color: var(--text);
+}
+
+.data-table th.sortable::after {
+    content: " ↕";
+    font-size: 14px;
+    opacity: 0.3;
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 4px;
+}
+
+.data-table th.sortable.asc::after {
+    content: " ↑";
+    opacity: 1;
+    color: var(--accent);
+}
+
+.data-table th.sortable.desc::after {
+    content: " ↓";
+    opacity: 1;
+    color: var(--accent);
+}
+
 .data-table td {
     padding: 14px 16px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.04);
