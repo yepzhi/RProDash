@@ -3,6 +3,9 @@
    Firestore (primary) + localStorage (fallback)
    ============================================== */
 
+// Safe Firestore handle — works even if Firebase loads after this file
+function getDb() { return typeof db !== 'undefined' ? db : null; }
+
 const ADVISORS = ['Luis', 'Alberto', 'Fabi', 'Edgar', 'Arturo', 'Daniel', 'Miguel', 'Vacante'];
 const MASTER_PIN = 'Pro2610';
 
@@ -42,9 +45,10 @@ function getSchools() {
 }
 
 async function getSchoolsAsync() {
-    if (db) {
+    const _db = getDb();
+    if (_db) {
         try {
-            const snap = await db.collection('schools').orderBy('updatedAt', 'desc').get();
+            const snap = await _db.collection('schools').orderBy('updatedAt', 'desc').get();
             const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
             localStorage.setItem('rprodash_schools', JSON.stringify(data)); // cache
             return data;
@@ -64,7 +68,7 @@ function saveSchool(school) {
     if (idx >= 0) schools[idx] = school; else schools.push(school);
     localStorage.setItem('rprodash_schools', JSON.stringify(schools));
 
-    if (db) db.collection('schools').doc(school.id).set(school).catch(console.warn);
+    if (getDb()) getDb().collection('schools').doc(school.id).set(school).catch(console.warn);
     return school;
 }
 
@@ -76,11 +80,11 @@ function deleteSchool(id) {
         trash.unshift({ ...school, deletedAt: new Date().toISOString() });
         localStorage.setItem('rprodash_trash', JSON.stringify(trash.slice(0, 20)));
         // Soft-delete in Firestore (add deletedAt flag so it can be restored)
-        if (db) db.collection('trash').doc(school.id).set({ ...school, deletedAt: new Date().toISOString() }).catch(console.warn);
+        if (getDb()) getDb().collection('trash').doc(school.id).set({ ...school, deletedAt: new Date().toISOString() }).catch(console.warn);
     }
     const schools = getSchools().filter(s => s.id !== id);
     localStorage.setItem('rprodash_schools', JSON.stringify(schools));
-    if (db) db.collection('schools').doc(id).delete().catch(console.warn);
+    if (getDb()) getDb().collection('schools').doc(id).delete().catch(console.warn);
 }
 
 function getTrash() {
@@ -94,7 +98,7 @@ function restoreLastDeleted() {
     localStorage.setItem('rprodash_trash', JSON.stringify(trash));
     delete school.deletedAt;
     saveSchool(school); // re-save to active schools
-    if (db) db.collection('trash').doc(school.id).delete().catch(console.warn);
+    if (getDb()) getDb().collection('trash').doc(school.id).delete().catch(console.warn);
     return school;
 }
 
@@ -106,7 +110,7 @@ function restoreById(id) {
     localStorage.setItem('rprodash_trash', JSON.stringify(trash));
     delete school.deletedAt;
     saveSchool(school);
-    if (db) db.collection('trash').doc(school.id).delete().catch(console.warn);
+    if (getDb()) getDb().collection('trash').doc(school.id).delete().catch(console.warn);
     return school;
 }
 
@@ -139,7 +143,7 @@ function bulkUpsertSchools(rows) {
     });
 
     localStorage.setItem('rprodash_schools', JSON.stringify(schools));
-    if (db) schools.forEach(s => db.collection('schools').doc(s.id).set(s).catch(console.warn));
+    if (getDb()) schools.forEach(s => db.collection('schools').doc(s.id).set(s).catch(console.warn));
     return results;
 }
 
@@ -155,7 +159,7 @@ function saveAdvisorStates(name, estados) {
     const all = JSON.parse(localStorage.getItem('rprodash_advisors') || '{}');
     all[name] = { ...(all[name] || {}), estados };
     localStorage.setItem('rprodash_advisors', JSON.stringify(all));
-    if (db) db.collection('advisors').doc(name).set({ estados }, { merge: true }).catch(console.warn);
+    if (getDb()) getDb().collection('advisors').doc(name).set({ estados }, { merge: true }).catch(console.warn);
 }
 
 function getAllAdvisorStates() {
@@ -198,13 +202,29 @@ async function logDownload(userName, fileName) {
     const logs = JSON.parse(localStorage.getItem('rprodash_audit') || '[]');
     logs.unshift(entry);
     localStorage.setItem('rprodash_audit', JSON.stringify(logs.slice(0, 500)));
-    if (db) db.collection('audit').doc(entry.id).set(entry).catch(console.warn);
+    if (getDb()) getDb().collection('audit').doc(entry.id).set(entry).catch(console.warn);
     return entry;
 }
 
 
 function getAuditLog() {
     return JSON.parse(localStorage.getItem('rprodash_audit') || '[]');
+}
+
+// ─────────────────────────────────────────────
+//  ADVISOR PHOTOS (base64 localStorage)
+// ─────────────────────────────────────────────
+function saveAdvisorPhoto(name, base64) {
+    const photos = JSON.parse(localStorage.getItem('rprodash_photos') || '{}');
+    photos[name] = base64;
+    localStorage.setItem('rprodash_photos', JSON.stringify(photos));
+    const _db = getDb();
+    if (_db) _db.collection('advisors').doc(name).set({ photo: base64 }, { merge: true }).catch(console.warn);
+}
+
+function getAdvisorPhoto(name) {
+    const photos = JSON.parse(localStorage.getItem('rprodash_photos') || '{}');
+    return photos[name] || null;
 }
 
 // ─────────────────────────────────────────────

@@ -11,7 +11,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.88);
             backdrop-filter: blur(30px);
             -webkit-backdrop-filter: blur(30px);
             border-bottom: 1px solid var(--glass-border);
@@ -37,126 +37,171 @@
             align-items: center;
         }
 
-        /* Advisor strip */
-        .advisor-strip {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding: 20px 24px 16px;
-            scrollbar-width: none;
+        /* ── Advisor picker ── */
+        .advisor-section {
+            padding: 28px 24px 0;
         }
 
-        .advisor-strip::-webkit-scrollbar {
+        .section-eyebrow {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-3);
+            margin-bottom: 16px;
+        }
+
+        .advisor-grid-home {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 12px;
+        }
+
+        .advisor-tile {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            padding: 20px 12px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            position: relative;
+        }
+
+        .advisor-tile:hover {
+            background: var(--glass-hover);
+            transform: translateY(-2px);
+        }
+
+        .advisor-tile.selected {
+            border-color: var(--tile-color, #0a84ff);
+            background: rgba(var(--tile-rgb, 10, 132, 255), 0.1);
+            box-shadow: 0 0 0 1.5px var(--tile-color, #0a84ff);
+        }
+
+        /* Photo circle */
+        .advisor-photo-circle {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .advisor-initial-circle {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 900;
+            flex-shrink: 0;
+        }
+
+        .upload-photo-hint {
+            position: absolute;
+            bottom: 6px;
+            right: 6px;
+            font-size: 9px;
+            color: var(--text-3);
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 6px;
+            padding: 2px 5px;
             display: none;
         }
 
-        .advisor-pill {
-            display: flex;
-            align-items: center;
-            gap: 9px;
-            padding: 8px 16px 8px 10px;
-            border-radius: 99px;
-            flex-shrink: 0;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            transition: var(--transition);
-            color: var(--text-2);
-            white-space: nowrap;
+        .advisor-tile:hover .upload-photo-hint {
+            display: block;
         }
 
-        .advisor-pill:hover {
-            background: var(--glass-hover);
+        .tile-name {
+            font-size: 13px;
+            font-weight: 700;
             color: var(--text);
         }
 
-        .advisor-pill.active {
-            border-color: var(--pill-color, #0a84ff);
-            background: rgba(var(--pill-rgb, 10, 132, 255), 0.12);
-            color: var(--pill-color, #0a84ff);
-            box-shadow: 0 0 0 1px var(--pill-color, #0a84ff);
-        }
-
-        .pill-dot {
-            width: 9px;
-            height: 9px;
-            border-radius: 50%;
-            background: var(--pill-color);
-            flex-shrink: 0;
-        }
-
-        .pill-count {
+        .tile-count {
             font-size: 11px;
-            font-weight: 700;
-            opacity: 0.7;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 99px;
-            padding: 2px 7px;
-            margin-left: 2px;
-        }
-
-        /* Hero section (visible when no advisor selected) */
-        .hero-section {
-            min-height: 60vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 40px 24px;
-        }
-
-        .hero-logo {
-            font-size: 56px;
-            font-weight: 900;
-            letter-spacing: -3px;
-            background: linear-gradient(135deg, #0a84ff, #30d158);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 12px;
-        }
-
-        .hero-sub {
-            font-size: 16px;
-            color: var(--text-2);
-            margin-bottom: 8px;
-        }
-
-        .hero-hint {
-            font-size: 13px;
             color: var(--text-3);
         }
 
-        /* Dashboard panel (inline) */
+        /* ── Global Button ── */
+        .global-btn {
+            margin: 20px 24px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, rgba(10, 132, 255, 0.12), rgba(48, 209, 88, 0.08));
+            border: 1px solid rgba(10, 132, 255, 0.3);
+            border-radius: 14px;
+            padding: 14px 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .global-btn:hover {
+            background: linear-gradient(135deg, rgba(10, 132, 255, 0.2), rgba(48, 209, 88, 0.14));
+        }
+
+        .global-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0a84ff, #30d158);
+            flex-shrink: 0;
+        }
+
+        .global-label {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .global-sub {
+            font-size: 12px;
+            color: var(--text-2);
+        }
+
+        .global-arrow {
+            margin-left: auto;
+            color: var(--text-3);
+            font-size: 16px;
+        }
+
+        /* ── Inline panel ── */
         .dash-panel {
             display: none;
+            margin-top: 24px;
         }
 
         .dash-panel.visible {
             display: block;
         }
 
-        /* KPI mini header */
         .advisor-header {
             display: flex;
             align-items: center;
             gap: 16px;
-            padding: 24px 24px 0;
+            padding: 0 24px;
         }
 
         .advisor-avatar-sm {
-            width: 48px;
-            height: 48px;
+            width: 52px;
+            height: 52px;
             border-radius: 50%;
+            flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 18px;
             font-weight: 900;
-            flex-shrink: 0;
         }
 
         .advisor-name-lg {
@@ -171,7 +216,6 @@
             margin-top: 2px;
         }
 
-        /* Quick actions */
         .quick-actions {
             display: flex;
             gap: 10px;
@@ -179,7 +223,6 @@
             padding: 16px 24px 0;
         }
 
-        /* Recent captures */
         .recent-table {
             margin: 20px 24px 0;
         }
@@ -193,21 +236,21 @@
             margin-bottom: 10px;
         }
 
-        @media (max-width:640px) {
-            .advisor-strip {
-                padding: 14px 16px 12px;
+        @media(max-width:600px) {
+            .advisor-grid-home {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
             }
 
-            .advisor-header {
-                padding: 16px 16px 0;
+            .advisor-tile {
+                padding: 14px 8px 12px;
+                border-radius: 14px;
             }
 
-            .quick-actions {
-                padding: 12px 16px 0;
-            }
-
-            .recent-table {
-                margin: 16px 16px 0;
+            .advisor-initial-circle,
+            .advisor-photo-circle {
+                width: 48px;
+                height: 48px;
             }
         }
     </style>
@@ -216,49 +259,44 @@
 <body>
     <canvas id="particleCanvas"></canvas>
 
-    <!-- Top nav -->
     <nav class="top-nav">
         <div class="brand">RProDash</div>
         <div class="nav-right">
-            <a href="dashboard.html" class="btn btn-secondary" style="font-size:12px">Dashboard completo</a>
             <button class="btn btn-secondary" onclick="sessionStorage.clear();window.location.href='login.html'"
                 style="font-size:12px">Salir</button>
         </div>
     </nav>
 
-    <!-- Advisor strip (always visible) -->
-    <div class="advisor-strip" id="advisorStrip"></div>
-
-    <!-- Hero (when no advisor selected) -->
-    <div class="hero-section" id="heroSection">
-        <div class="hero-logo">RProDash</div>
-        <div class="hero-sub">CRM de Seguimiento · Richmond Pro México</div>
-        <div class="hero-hint">Selecciona un asesor arriba para ver su resumen</div>
+    <!-- Always-visible Datos Globales button -->
+    <div class="global-btn" onclick="window.location.href='dashboard.html'">
+        <div class="global-dot"></div>
+        <div>
+            <div class="global-label">Datos Globales</div>
+            <div class="global-sub">Vista general · todos los asesores</div>
+        </div>
+        <div class="global-arrow">→</div>
     </div>
 
-    <!-- Inline dashboard panel -->
-    <div class="dash-panel" id="dashPanel">
-        <!-- Advisor header -->
-        <div class="advisor-header" id="advisorHeader"></div>
+    <!-- Advisor picker -->
+    <div class="advisor-section">
+        <div class="section-eyebrow">Selecciona tu perfil</div>
+        <div class="advisor-grid-home" id="advisorGrid"></div>
+    </div>
 
-        <!-- Quick actions -->
+    <!-- Inline KPI panel -->
+    <div class="dash-panel" id="dashPanel">
+        <div class="advisor-header" id="advisorHeader"></div>
         <div class="quick-actions">
-            <a id="captureBtn" href="capture.html" class="btn btn-primary" style="font-size:14px">+ Capturar oportunidad
-                / usuario</a>
+            <a href="capture.html" class="btn btn-primary" style="font-size:14px">+ Capturar oportunidad / usuario</a>
             <a id="profileBtn" href="profile.html" class="btn btn-secondary" style="font-size:14px">Ver perfil
                 completo</a>
-            <a href="dashboard.html" class="btn btn-secondary" style="font-size:14px">Dashboard global</a>
         </div>
-
-        <!-- Mini KPIs -->
         <div style="padding:20px 24px 0">
             <div class="section-label">Resumen</div>
             <div class="kpi-grid" id="miniKpi"></div>
         </div>
-
-        <!-- Recent schools -->
         <div class="recent-table">
-            <div class="section-label">Últimas escuelas capturadas</div>
+            <div class="section-label">Últimas escuelas</div>
             <div class="table-glass">
                 <div class="table-wrapper">
                     <table class="data-table">
@@ -281,120 +319,133 @@
     </div>
 
     <!-- FAB -->
-    <a href="capture.html" class="fab" id="fabBtn" title="Capturar oportunidad / usuario">+</a>
+    <a href="capture.html" class="fab" title="Capturar oportunidad / usuario">+</a>
 
-    <!-- Firebase SDKs -->
+    <!-- Hidden photo upload input -->
+    <input type="file" id="photoInput" accept="image/*" style="display:none">
+
+    <script src="app.js"></script>
+    <script>
+    if (        uireAuth()) {}
+
+    let selectedAdvisor = getCurrent        sor() || null;
+    let pendin        toFor  = null;
+
+    // Build advisor grid
+    const gri        document.getElementById('ad            rid');
+    ADVISORS.forEach(name => {
+      const schools = g            ols().filter(s => s.asesor === nam                const color   = advisorColor(name);
+            const initial = ADVISOR_INITIALS[name];
+                t photo   = getAdvisorPhoto(name);
+
+      const tile = document.createElement('            
+      tile.className = 'advisor-tile' + (selec            isor === name ? ' selected' : '');
+      tile.style.setProperty('--tile-color', color);
+      tile.id = 'tile_' + name;
+
+      const avatarHtml = photo
+        ? `<img            ${photo}" class="advisor-photo-circle" style="border:2px so            color}66" alt="${name}">`
+              : `<div class="advisor-        ial-c        e" style="background:linear-gradient(135deg,        lor}77,${color}22);border:2px s            {color}44;color:${color}            itial}</div>`;
+
+      tile            HTML = `
+        ${avatarHtml                <div class="tile-name">${name}</div>
+        <div class="tile-count">${schools.leng            cuela${schools.length !== 1 ? 's' : ''}</div>
+        <div c            upload-photo-hint">Cambiar foto</div>
+      `;
+
+                 addEventListener('click', () => se            visor(name));
+      tile.addEventListene            textmenu', e => {
+        e.preventDefault();
+        pendingP            r = name;
+        documen            lementById('photoInput').click();
+      });
+      grid.appendCh            le);
+    });
+
+    // Photo upload handler
+    document.getElemen            'photoInput').addEventListener('ch             function() {
+      if (!this.files[0] || !pendingPhotoFor) r            
+      const reader = new FileReader();
+      reader.onload = e => {
+        saveAdvisorPhoto(pen            otoFor, e.target.result);
+        // Refresh that tile's i                   const tile             ment.getElementById('tile_' + pendingPhotoFor);
+        if (tile) {
+          const img = tile.querySelector('.advisor-photo-circle, .advisor-initial-circle');
+          if (img) {
+            img.outerHTML = `<img src="${e.target.result}" class="advisor-photo-circle" style="border:2px solid ${advisorColor(pendingPhotoFor)}66" alt="${pendingPhotoFor}">`;
+          }
+        }
+        pendingPhotoFor = null;
+      };
+      reader.readAsDataURL(            iles[0])              this.value = '';
+    });
+
+    function selectAdvisor(name) {
+      selectedAdv             name;
+      set rentAdvisor(name);
+      document.querySelectorAll('.adviso            ').forEach(t =>  lassList.remove('selected'));
+      const tile = docum            tElementById(' ' + name);
+      if (tile) tile.classList.add('selec            
+
+      const color   = advisorColor(name);
+      const initial = ADVISOR_INITIALS[name];
+      const schools = getSchools().filter(s => s.asesor === name);
+      const photo   = getAdvisorPhoto(name);
+
+      document.getElementById('profileBtn').href = `profile.html?advisor=${encodeURIComponent(name)}`;
+      document.getElementById('dashPanel').classList.add('visible');
+
+      const avatarHtml = photo
+        ? `<img src="${photo}" class="advisor-photo-circle" style="width:52px;height:52px;border:2px solid ${color}66" alt="${name}">`
+        : `<div class="advisor-avatar-sm" style="background:linear-gradient(135deg,${color}77,${color}22);border:2px sol            olor}44;color:${colo            initial}</div>`;
+
+      document.get ElementById('advis or Header').innerHTML = `
+          ${avatarHtml}
+                iv>
+          <div class="advisor-name-lg">${name}</d                    <div class="ad                ta-sm">${schools.length} escuela${schools.length !== 1 ? 's' : ''} capturadas</div>
+        </div>
+      `;
+
+      const totalAlumnos = sch            educe((a,                + (x.alumnos_periodo||0), 0);
+                          lVenta   = schools.reduce((a,x) => a + calc                    ctada(x), 0);
+      const conquistas   = schools.filter(x => x.tipo === 'conquista').length;
+      const usuari os      = sch o ols.filter(x   => x.tipo === 'usuario'). len gth;
+        document . getElementById('miniKpi').innerHTML = `
+        <div class="kpi-card"><div class="kpi-label">Escuelas</div><div class="kpi-v al ue">${schools.length}</div><div class="kpi-sub">${usuarios} usuarios · ${conquistas} conquistas</div></div>
+        <div class="kpi-card"><div class="kpi-label">Alumnos / Periodo</div><div class="kpi-value">${formatNumber(totalAlumnos)}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Venta proyectada</div><div cl                -value" style            -s        1.5        ${formatCurrency(tot            a)}</div></div>
+        `;
+
+      cons t recent = [...schools ].sort((a,b) => (b.up datedAt||        loc        ompare(a.updatedAt||'')).slice(0,8);
+      const tbody  =         ment.getElementById('recentBody');
+      tbody.innerH        = !recent.length
+        ? `<tr><td colspan=" sext-align:center;padding:30px;color:var(--text-3)">Sin escuelas capturadas aún.</td></tr>`
+        : recent.map(s => {
+            const et = etapaColor(s.etapa||'');
+            return `<tr>
+              <td><strong>${esc(s.nombre)}</strong></td>
+              <td><span class="badge ${s.tipo==='usuario'?'badge-blue':'badge-orange'}">${s.tipo==='usuario'?'Usuario':'Conquista'}</span></td>
+              <td><span class="badge" style="background:${et}22;color:${et}">${esc(s.etapa)||'—'}</span></td>
+              <td style="text-align:right">${formatNumber(s.alumnos_periodo)}</td>
+              <td style="text-align:right;font-weight:700;color:var(--accent)">${formatCurrency(calcVentaProyectada(s))}</td>
+              <td style="color:var(--text-3);font-size:12px">${formatDate(s.updatedAt)}</td>
+            </tr>`;
+          }).join('');
+
+      // Scroll to panel
+      document.getElementById('dashPanel').scrollIntoView({ behavior:'smooth', block:'start' });
+    }
+
+    function esc(str) { return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    if (selectedAdvisor) selectAdvisor(selectedAdvisor);
+    initParticles('particleCanvas', '#0a84ff');
+    </script>
+
+    <!-- Firebase after UI scripts -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="firebase.js"></script>
-    <script src="app.js"></script>
-    <script>
-        if (!requireAuth()) { /* redirects */ }
-
-        let selectedAdvisor = getCurrentAdvisor() || null;
-
-        // ── Build advisor strip ──
-        const strip = document.getElementById('advisorStrip');
-        ADVISORS.forEach(name => {
-            const schools = getSchools().filter(s => s.asesor === name);
-            const color = advisorColor(name);
-            const initial = ADVISOR_INITIALS[name];
-            const pill = document.createElement('div');
-            pill.className = 'advisor-pill' + (selectedAdvisor === name ? ' active' : '');
-            pill.style.setProperty('--pill-color', color);
-            pill.innerHTML = `
-        <div class="pill-dot" style="background:${color}"></div>
-        ${name}
-        <span class="pill-count">${schools.length}</span>
-      `;
-            pill.addEventListener('click', () => selectAdvisor(name));
-            pill.id = 'pill_' + name;
-            strip.appendChild(pill);
-        });
-
-        // ── Select advisor → show inline panel ──
-        function selectAdvisor(name) {
-            selectedAdvisor = name;
-            setCurrentAdvisor(name);
-
-            // Update strip active state
-            document.querySelectorAll('.advisor-pill').forEach(p => p.classList.remove('active'));
-            const activePill = document.getElementById('pill_' + name);
-            if (activePill) activePill.classList.add('active');
-
-            const color = advisorColor(name);
-            const initial = ADVISOR_INITIALS[name];
-            const schools = getSchools().filter(s => s.asesor === name);
-
-            // Hide hero, show panel
-            document.getElementById('heroSection').style.display = 'none';
-            document.getElementById('dashPanel').classList.add('visible');
-
-            // Update capture / profile links
-            document.getElementById('captureBtn').href = 'capture.html';
-            document.getElementById('profileBtn').href = `profile.html?advisor=${encodeURIComponent(name)}`;
-            document.getElementById('fabBtn').href = 'capture.html';
-
-            // Advisor header
-            document.getElementById('advisorHeader').innerHTML = `
-        <div class="advisor-avatar-sm" style="background:linear-gradient(135deg,${color}77,${color}22);border:2px solid ${color}44;color:${color}">
-          ${initial}
-        </div>
-        <div>
-          <div class="advisor-name-lg">${name}</div>
-          <div class="advisor-meta-sm">${schools.length} escuela${schools.length !== 1 ? 's' : ''} capturadas</div>
-        </div>
-      `;
-
-            // KPIs
-            const totalAlumnos = schools.reduce((a, x) => a + (x.alumnos_periodo || 0), 0);
-            const totalVenta = schools.reduce((a, x) => a + calcVentaProyectada(x), 0);
-            const conquistas = schools.filter(x => x.tipo === 'conquista').length;
-            const usuarios = schools.filter(x => x.tipo === 'usuario').length;
-            document.getElementById('miniKpi').innerHTML = `
-        <div class="kpi-card">
-          <div class="kpi-label">Escuelas</div>
-          <div class="kpi-value">${schools.length}</div>
-          <div class="kpi-sub">${usuarios} usuarios · ${conquistas} conquistas</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Alumnos / Periodo</div>
-          <div class="kpi-value">${formatNumber(totalAlumnos)}</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Venta proyectada</div>
-          <div class="kpi-value" style="font-size:1.5em">${formatCurrency(totalVenta)}</div>
-        </div>
-      `;
-
-            // Recent 8 schools
-            const recent = [...schools].sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || '')).slice(0, 8);
-            const tbody = document.getElementById('recentBody');
-            if (!recent.length) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-3)">Sin escuelas capturadas aún.</td></tr>`;
-            } else {
-                tbody.innerHTML = recent.map(s => {
-                    const etColor = etapaColor(s.etapa || '');
-                    return `<tr>
-            <td><strong>${esc(s.nombre)}</strong></td>
-            <td><span class="badge ${s.tipo === 'usuario' ? 'badge-blue' : 'badge-orange'}">${s.tipo === 'usuario' ? 'Usuario' : 'Conquista'}</span></td>
-            <td><span class="badge" style="background:${etColor}22;color:${etColor}">${esc(s.etapa) || '—'}</span></td>
-            <td style="text-align:right">${formatNumber(s.alumnos_periodo)}</td>
-            <td style="text-align:right;font-weight:700;color:var(--accent)">${formatCurrency(calcVentaProyectada(s))}</td>
-            <td style="color:var(--text-3);font-size:12px">${formatDate(s.updatedAt)}</td>
-          </tr>`;
-                }).join('');
-            }
-        }
-
-        function esc(str) {
-            return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        }
-
-        // Boot: if advisor already selected, show panel directly
-        if (selectedAdvisor) selectAdvisor(selectedAdvisor);
-        initParticles('particleCanvas', '#0a84ff');
-    </script>
 </body>
 
 </html>
