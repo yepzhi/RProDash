@@ -408,20 +408,18 @@
       // Photo upload handler
       document.getElementById('photoInput').addEventListener('change', function () {
         if (!this.files[0] || !pendingPhotoFor) return;
-        const reader = new FileReader();
-        reader.onload = e => {
-          saveAdvisorPhoto(pendingPhotoFor, e.target.result);
+        resizeImageFile(this.files[0], 300, (base64) => {
+          saveAdvisorPhoto(pendingPhotoFor, base64);
           const tile = document.getElementById('tile_' + pendingPhotoFor);
           if (tile) {
             const img = tile.querySelector('.advisor-photo-circle, .advisor-initial-circle');
             if (img) {
-              img.outerHTML = `<img src="${e.target.result}" class="advisor-photo-circle" style="border:2px solid ${advisorColor(pendingPhotoFor)}66" alt="${pendingPhotoFor}">`;
+              img.outerHTML = `<img src="${base64}" class="advisor-photo-circle" style="border:2px solid ${advisorColor(pendingPhotoFor)}66" alt="${pendingPhotoFor}">`;
             }
           }
           pendingPhotoFor = null;
           if (selectedAdvisor !== 'GLOBAL') selectAdvisor(selectedAdvisor); // re-render header
-        };
-        reader.readAsDataURL(this.files[0]);
+        });
         this.value = '';
       });
 

@@ -237,9 +237,7 @@ function escapeHtml(str) {
 function handlePhotoUpload(input) {
   const file = input.files[0];
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    const base64 = e.target.result;
+  resizeImageFile(file, 300, (base64) => {
     saveAdvisorPhoto(advisor, base64);
 
     const av = document.getElementById('profileAvatar');
@@ -248,8 +246,7 @@ function handlePhotoUpload(input) {
     av.style.border = `2px solid ${color}66`;
     av.textContent = '';
     av.innerHTML = `<img src="${base64}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
-  };
-  reader.readAsDataURL(file);
+  });
   input.value = '';
 }
 

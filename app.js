@@ -178,8 +178,8 @@ async function getAdvisorsAsync() {
                 if (data.estados) advisorsData[d.id] = { estados: data.estados };
                 if (data.photo) photosData[d.id] = data.photo;
             });
-            localStorage.setItem('rprodash_advisors', JSON.stringify(advisorsData));
-            localStorage.setItem('rprodash_photos', JSON.stringify(photosData));
+            try { localStorage.setItem('rprodash_advisors', JSON.stringify(advisorsData)); } catch (e) { }
+            try { localStorage.setItem('rprodash_photos', JSON.stringify(photosData)); } catch (e) { console.warn("Photos exceed localStorage limit"); }
             return advisorsData;
         } catch (e) { console.warn('Firestore advisors read failed:', e); }
     }
@@ -237,7 +237,7 @@ function getAuditLog() {
 function saveAdvisorPhoto(name, base64) {
     const photos = JSON.parse(localStorage.getItem('rprodash_photos') || '{}');
     photos[name] = base64;
-    localStorage.setItem('rprodash_photos', JSON.stringify(photos));
+    try { localStorage.setItem('rprodash_photos', JSON.stringify(photos)); } catch (e) { }
     const _db = getDb();
     if (_db) _db.collection('advisors').doc(name).set({ photo: base64 }, { merge: true }).catch(console.warn);
 }
@@ -245,6 +245,24 @@ function saveAdvisorPhoto(name, base64) {
 function getAdvisorPhoto(name) {
     const photos = JSON.parse(localStorage.getItem('rprodash_photos') || '{}');
     return photos[name] || null;
+}
+
+function resizeImageFile(file, maxWidth, callback) {
+    const reader = new FileReader();
+    reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let w = img.width, h = img.height;
+            if (w > maxWidth) { h = Math.round(h * (maxWidth / w)); w = maxWidth; }
+            canvas.width = w; canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            callback(canvas.toDataURL('image/jpeg', 0.8));
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
 }
 
 // ─────────────────────────────────────────────
