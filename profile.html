@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil — RProDash</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .profile-hero {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 32px 0 24px;
+        }
+
+        .profile-avatar-lg {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: 900;
+            flex-shrink: 0;
+        }
+
+        .profile-name-lg {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 24px;
+            margin-top: 6px;
+            flex-wrap: wrap;
+        }
+
+        .pstat {
+            font-size: 13px;
+            color: var(--text-2);
+        }
+
+        .pstat strong {
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-3);
+            margin-bottom: 14px;
+        }
+
+        .state-map-wrap {
+            position: relative;
+        }
+
+        .mexico-map {
+            width: 100%;
+            max-width: 680px;
+        }
+
+        .mexico-map path {
+            cursor: pointer;
+            fill: #1c1c1e;
+            stroke: rgba(255, 255, 255, 0.1);
+            stroke-width: 0.8;
+            transition: fill 0.2s;
+        }
+
+        .mexico-map path:hover {
+            fill: rgba(10, 132, 255, 0.2);
+        }
+
+        .state-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .state-tag {
+            padding: 6px 14px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: 600;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            color: var(--text-2);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .state-tag.on {
+            color: #fff;
+        }
+
+        .search-bar {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 18px 12px 42px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+        }
+
+        .search-bar input:focus {
+            border-color: var(--accent);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-3);
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="particleCanvas"></canvas>
+    <nav class="nav">
+        <div class="nav-brand">RProDash</div>
+        <div class="nav-actions">
+            <a href="dashboard.html" class="btn btn-secondary" style="font-size:13px;">← Dashboard</a>
+            <a href="index.html" class="btn btn-icon" title="Cambiar asesor">⇄</a>
+        </div>
+    </nav>
+
+    <div class="app-wrapper">
+        <div class="page-content">
+            <!-- Profile Hero -->
+            <div class="profile-hero">
+                <div class="profile-avatar-lg" id="profileAvatar"></div>
+                <div>
+                    <div class="profile-name-lg" id="profileName">—</div>
+                    <div class="profile-stats" id="profileStats"></div>
+                </div>
+            </div>
+
+            <!-- Mini KPIs -->
+            <div class="kpi-grid" id="miniKpis" style="margin-bottom:32px"></div>
+
+            <!-- Schools Section -->
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <div class="section-title">Mis Escuelas</div>
+                <a href="capture.html" class="btn btn-primary" style="font-size:13px;">+ Nueva</a>
+            </div>
+
+            <div class="search-bar">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="Buscar escuela..." oninput="filterSchools()">
+            </div>
+
+            <div id="schoolsList"></div>
+
+            <!-- States Section -->
+            <div style="margin-top:40px; margin-bottom:16px;">
+                <div class="section-title">Mis Estados a Cargo</div>
+                <p style="font-size:13px; color:var(--text-2); margin-bottom:16px;">
+                    Selecciona los estados que atiendes. Estos se visualizarán en el mapa del dashboard.
+                </p>
+            </div>
+            <div class="glass" style="padding:24px; margin-bottom:32px;">
+                <div class="state-list" id="stateList"></div>
+                <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                    <button class="btn btn-primary" onclick="saveStates()">Guardar estados</button>
+                    <span id="statesSaved" style="font-size:13px; color:var(--accent-2); display:none;">✅
+                        Guardado</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a href="capture.html" class="fab" title="Nueva captura">+</a>
+
+    <script src="app.js"></script>
+    <script src="profile.js"></script>
+</body>
+
+</html>

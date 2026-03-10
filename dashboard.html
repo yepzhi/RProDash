@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — RProDash</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .section-title2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .table-glass {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .ratio-bar {
+            height: 8px;
+            border-radius: 99px;
+            background: rgba(255, 255, 255, 0.08);
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .ratio-fill {
+            height: 100%;
+            border-radius: 99px;
+            transition: width 0.6s ease;
+        }
+
+        /* Map */
+        #mapSvg {
+            width: 100%;
+            height: auto;
+        }
+
+        #mapSvg path {
+            cursor: pointer;
+            stroke: rgba(255, 255, 255, 0.1);
+            stroke-width: 0.8;
+            fill: #1c1c1e;
+            transition: all 0.2s;
+        }
+
+        #mapSvg path:hover {
+            stroke: rgba(255, 255, 255, 0.3);
+        }
+
+        .map-tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 12px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.15s;
+            z-index: 999;
+            white-space: nowrap;
+        }
+
+        /* Charts container */
+        .chart-box {
+            position: relative;
+            height: 240px;
+        }
+
+        canvas {
+            max-height: 240px;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="particleCanvas"></canvas>
+    <nav class="nav">
+        <div class="nav-brand">RProDash</div>
+        <div class="nav-actions">
+            <div class="tabs" id="mainTabs">
+                <button class="tab active" data-panel="panelResumen" onclick="switchTab(this)">📊 Resumen</button>
+                <button class="tab" data-panel="panelGraficas" onclick="switchTab(this)">📈 Gráficas</button>
+                <button class="tab" data-panel="panelMapa" onclick="switchTab(this)">🗺 Mapa</button>
+            </div>
+            <div id="navAdvisorBadge" class="nav-advisor" style="cursor:pointer;"
+                onclick="window.location.href='index.html'" title="Cambiar asesor"></div>
+        </div>
+    </nav>
+
+    <div class="app-wrapper">
+        <div class="page-content">
+
+            <!-- ── Tab: Resumen ── -->
+            <div class="tab-panel active" id="panelResumen">
+                <!-- KPIs -->
+                <div class="kpi-grid" id="kpiGrid"></div>
+
+                <!-- Filters -->
+                <div class="filter-bar" id="filterBar">
+                    <select class="filter-select" id="fAsesor" onchange="applyFilters()">
+                        <option value="">Todos los asesores</option>
+                    </select>
+                    <select class="filter-select" id="fTipo" onchange="applyFilters()">
+                        <option value="">Todos los tipos</option>
+                        <option value="usuario">Usuario</option>
+                        <option value="conquista">Conquista</option>
+                    </select>
+                    <select class="filter-select" id="fEtapa" onchange="applyFilters()">
+                        <option value="">Todas las etapas</option>
+                    </select>
+                    <select class="filter-select" id="fDist" onchange="applyFilters()">
+                        <option value="">Todos los canales</option>
+                        <option value="directo">Directo</option>
+                        <option value="distribuidor">Distribuidor</option>
+                    </select>
+                    <button class="btn btn-secondary" style="font-size:13px" onclick="resetFilters()">✕ Limpiar</button>
+                </div>
+
+                <!-- Table -->
+                <div class="section-header">
+                    <div class="section-title2">Escuelas <span id="countBadge" class="badge badge-gray"
+                            style="font-size:14px;margin-left:6px;"></span></div>
+                    <div style="display:flex;gap:10px">
+                        <a href="profile.html" class="btn btn-secondary" style="font-size:13px;">Mi perfil</a>
+                    </div>
+                </div>
+                <div class="table-glass">
+                    <div class="table-wrapper">
+                        <table class="data-table" id="mainTable">
+                            <thead>
+                                <tr>
+                                    <th>Escuela</th>
+                                    <th>Asesor</th>
+                                    <th>Tipo</th>
+                                    <th>Etapa</th>
+                                    <th>Alumnos/Per.</th>
+                                    <th>Precio neto</th>
+                                    <th>Venta proy.</th>
+                                    <th>Canal</th>
+                                    <th>Actualizado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Tab: Gráficas ── -->
+            <div class="tab-panel" id="panelGraficas">
+                <div class="chart-grid">
+                    <div class="glass chart-card">
+                        <div class="chart-title">Distribución por Tipo</div>
+                        <div class="chart-box"><canvas id="chartTipo"></canvas></div>
+                    </div>
+                    <div class="glass chart-card">
+                        <div class="chart-title">Escuelas por Asesor</div>
+                        <div class="chart-box"><canvas id="chartAsesor"></canvas></div>
+                    </div>
+                    <div class="glass chart-card">
+                        <div class="chart-title">Etapa de Conquista</div>
+                        <div class="chart-box"><canvas id="chartEtapa"></canvas></div>
+                    </div>
+                    <div class="glass chart-card">
+                        <div class="chart-title">Venta proyectada por Asesor</div>
+                        <div class="chart-box"><canvas id="chartVenta"></canvas></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Tab: Mapa ── -->
+            <div class="tab-panel" id="panelMapa">
+                <div class="glass" style="padding:24px; margin-bottom:20px;">
+                    <div class="section-title2" style="margin-bottom:16px;">Territorios por Asesor</div>
+                    <div class="map-legend" id="mapLegend"></div>
+                </div>
+                <div class="glass" style="padding:24px; position:relative;">
+                    <div id="mapTooltip" class="map-tooltip"></div>
+                    <svg id="mapSvg" viewBox="0 0 1200 900" xmlns="http://www.w3.org/2000/svg"></svg>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <a href="capture.html" class="fab" title="Nueva captura">+</a>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="app.js"></script>
+    <script src="dashboard.js"></script>
+</body>
+
+</html>

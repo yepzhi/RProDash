@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RProDash — Selecciona tu perfil</title>
+    <meta name="description" content="CRM de seguimiento escolar para asesores comerciales">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .login-wrap {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 24px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .login-logo {
+            font-size: 42px;
+            font-weight: 900;
+            letter-spacing: -2px;
+            background: linear-gradient(135deg, #0a84ff 0%, #30d158 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .login-sub {
+            font-size: 15px;
+            color: var(--text-2);
+        }
+
+        .login-grid {
+            width: 100%;
+            max-width: 720px;
+        }
+
+        .advisor-count {
+            font-size: 12px;
+            color: var(--text-3);
+            text-align: center;
+            margin-top: 24px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="particleCanvas"></canvas>
+    <div class="login-wrap">
+        <div class="login-header">
+            <div class="login-logo">RProDash</div>
+            <div class="login-sub">CRM de Seguimiento Escolar · Richmond</div>
+        </div>
+        <div class="login-grid">
+            <div class="advisor-grid" id="advisorGrid"></div>
+            <div class="advisor-count">10 asesores · Selecciona tu perfil para continuar</div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Render advisor cards
+        const grid = document.getElementById('advisorGrid');
+        const current = getCurrentAdvisor();
+
+        ADVISORS.forEach(name => {
+            const schools = getSchools().filter(s => s.asesor === name);
+            const color = advisorColor(name);
+            const initial = ADVISOR_INITIALS[name];
+            const card = document.createElement('div');
+            card.className = 'advisor-card' + (current === name ? ' active-advisor' : '');
+            card.innerHTML = `
+        <div class="advisor-avatar" style="background: linear-gradient(135deg, ${color}99, ${color}44); border: 2px solid ${color}55;">
+          <span style="color:${color}">${initial}</span>
+        </div>
+        <div class="advisor-name">${name}</div>
+        <div class="advisor-meta">${schools.length} escuela${schools.length !== 1 ? 's' : ''}</div>
+      `;
+            card.addEventListener('click', () => {
+                setCurrentAdvisor(name);
+                window.location.href = 'dashboard.html';
+            });
+            grid.appendChild(card);
+        });
+
+        initParticles('particleCanvas', '#0a84ff');
+    </script>
+</body>
+
+</html>
