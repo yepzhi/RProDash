@@ -9,6 +9,7 @@ let filteredSchools = [];
 
 // ── Boot ──
 function boot() {
+    if (!requireAuth()) return;
     const advisor = getCurrentAdvisor();
     const color = advisor ? advisorColor(advisor) : '#0a84ff';
 
@@ -39,6 +40,7 @@ function switchTab(btn) {
     document.getElementById(btn.dataset.panel).classList.add('active');
     // Rebuild charts when tab becomes visible
     if (btn.dataset.panel === 'panelGraficas') { buildCharts(); }
+    if (btn.dataset.panel === 'panelAudit') { renderAudit(); }
 }
 
 // ── Filter Options ──
@@ -355,6 +357,152 @@ function buildMap() {
 
 function esc(str) {
     return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// ── Excel export ──
+const EXCEL_COLS = [
+    'asesor', 'nombre', 'tipo', 'tipoCompra', 'etapa', 'alumnosTotales', 'alumnos_periodo',
+    'periodicidad', 'precioNeto', 'distribuidor', 'nombreDistribuidor', 'createdAt', 'updatedAt'
+];
+const EXCEL_HEADERS = {
+    asesor: 'Asesor', nombre: 'Nombre Escuela', tipo: 'Tipo', tipoCompra: 'Tipo Compra',
+    etapa: 'Etapa', alumnosTotales: 'Alumnos Totales', alumnos_periodo: 'Alumnos/Periodo',
+    periodicidad: 'Periodicidad', precioNeto: 'Precio Neto', distribuidor: 'Canal',
+    nombreDistribuidor: 'Nombre Distribuidor', createdAt: 'Creado', updatedAt: 'Actualizado'
+};
+
+let pendingDownloadName = '';
+
+function openDownloadModal() {
+    document.getElementById('downloadModal').style.display = 'flex';
+    setTimeout(() => document.getElementById('dlName').focus(), 100);
+}
+function closeDownloadModal() {
+    document.getElementById('downloadModal').style.display = 'none';
+    document.getElementById('dlName').value = '';
+}
+async function confirmDownload() {
+    const name = document.getElementById('dlName').value.trim();
+    if (!name) { alert('Por favor escribe tu nombre.'); return; }
+    closeDownloadModal();
+    await logDownload(name, 'rprodash_escuelas.xlsx');
+    exportExcel(name);
+}
+
+function exportExcel(exporterName) {
+    const s = getSchools();
+    const rows = s.map(school => {
+        const row = {};
+        EXCEL_COLS.forEach(col => { row[EXCEL_HEADERS[col]] = school[col] ?? ''; });
+        return row;
+    });
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Escuelas');
+
+    // Second sheet: audit log
+    const logs = getAuditLog();
+    const logsRows = logs.map(l => ({
+        'Fecha/Hora': l.ts, 'Nombre': l.userName, 'Archivo': l.fileName,
+        'IP': l.ip, 'Dispositivo': l.ua
+    }));
+    const wsLog = XLSX.utils.json_to_sheet(logsRows);
+    XLSX.utils.book_append_sheet(wb, wsLog, 'Historial Descargas');
+
+    XLSX.writeFile(wb, 'rprodash_escuelas.xlsx');
+}
+
+function downloadTemplate() {
+    openDownloadModalTemplate();
+}
+
+async function openDownloadModalTemplate() {
+    const name = prompt('Tu nombre completo (para el registro de descarga):');
+    if (!name) return;
+    await logDownload(name.trim(), 'plantilla_importacion.xlsx');
+
+    const headers = EXCEL_COLS.map(c => EXCEL_HEADERS[c]);
+    const sampleRow = [
+        'Luis', 'Escuela Ejemplo', 'conquista', 'regular', 'Diagnóstico 20%', '1000', '333', 'cuatrimestral', '185', 'directo', '', '2025-01-01', '2025-01-01'
+    ];
+    const ws = XLSX.utils.aoa_to_sheet([headers, sampleRow]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Plantilla');
+    XLSX.writeFile(wb, 'plantilla_importacion.xlsx');
+}
+
+// ── Bulk Import ──
+function handleImportFile(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const wb = XLSX.read(e.target.result, { type: 'binary' });
+            const ws = wb.Sheets[wb.SheetNames[0]];
+            const raw = XLSX.utils.sheet_to_json(ws);
+
+            // Map Excel headers to internal keys
+            const reverseHeaders = {};
+            Object.entries(EXCEL_HEADERS).forEach(([k, v]) => { reverseHeaders[v] = k; });
+
+            const rows = raw.map(r => {
+                const obj = {};
+                Object.entries(r).forEach(([header, val]) => {
+                    const key = reverseHeaders[header];
+                    if (key) obj[key] = val;
+                });
+                return obj;
+            }).filter(r => r.nombre);
+
+            const result = bulkUpsertSchools(rows);
+            allSchools = getSchools();
+            filteredSchools = [...allSchools];
+            renderKPIs(); renderTable();
+
+            const okEl = document.getElementById('importOk');
+            okEl.textContent = `✅ Importación completa: ${result.added} nuevas, ${result.updated} actualizadas.${result.errors.length ? ' Errores: ' + result.errors.join('; ') : ''}`;
+            okEl.style.display = 'block';
+            document.getElementById('importErr').style.display = 'none';
+        } catch (err) {
+            const errEl = document.getElementById('importErr');
+            errEl.textContent = '❌ Error al leer el archivo: ' + err.message;
+            errEl.style.display = 'block';
+            document.getElementById('importOk').style.display = 'none';
+        }
+        input.value = '';
+    };
+    reader.readAsBinaryString(file);
+}
+
+// Drag & Drop
+document.addEventListener('DOMContentLoaded', () => {
+    const drop = document.getElementById('importDrop');
+    if (!drop) return;
+    drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('drag-over'); });
+    drop.addEventListener('dragleave', () => drop.classList.remove('drag-over'));
+    drop.addEventListener('drop', e => {
+        e.preventDefault(); drop.classList.remove('drag-over');
+        const file = e.dataTransfer.files[0];
+        if (file) { const dt = new DataTransfer(); dt.items.add(file); document.getElementById('importFile').files = dt.files; handleImportFile(document.getElementById('importFile')); }
+    });
+});
+
+// ── Audit Log ──
+function renderAudit() {
+    const tbody = document.getElementById('auditBody');
+    const logs = getAuditLog();
+    if (!logs.length) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text-3)">Sin registros de descarga.</td></tr>`;
+        return;
+    }
+    tbody.innerHTML = logs.map(l => `<tr>
+        <td>${new Date(l.ts).toLocaleString('es-MX')}</td>
+        <td><strong>${esc(l.userName)}</strong></td>
+        <td>${esc(l.fileName)}</td>
+        <td><code style="color:var(--accent-2)">${esc(l.ip)}</code></td>
+        <td style="font-size:11px;color:var(--text-3);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(l.ua)}</td>
+    </tr>`).join('');
 }
 
 boot();

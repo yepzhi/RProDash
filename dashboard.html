@@ -17,7 +17,6 @@
         .section-title2 {
             font-size: 18px;
             font-weight: 700;
-            color: var(--text);
         }
 
         .table-glass {
@@ -41,7 +40,6 @@
             transition: width 0.6s ease;
         }
 
-        /* Map */
         #mapSvg {
             width: 100%;
             height: auto;
@@ -73,7 +71,6 @@
             white-space: nowrap;
         }
 
-        /* Charts container */
         .chart-box {
             position: relative;
             height: 240px;
@@ -82,11 +79,121 @@
         canvas {
             max-height: 240px;
         }
+
+        /* Excel / Import Panel */
+        .action-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .import-drop {
+            border: 2px dashed var(--glass-border);
+            border-radius: 16px;
+            padding: 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-2);
+            font-size: 14px;
+        }
+
+        .import-drop:hover,
+        .import-drop.drag-over {
+            border-color: var(--accent);
+            background: rgba(10, 132, 255, 0.06);
+        }
+
+        .import-result {
+            margin-top: 12px;
+            padding: 14px 18px;
+            border-radius: 12px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .import-ok {
+            background: rgba(48, 209, 88, 0.1);
+            border: 1px solid rgba(48, 209, 88, 0.3);
+            color: var(--accent-2);
+        }
+
+        .import-err {
+            background: rgba(255, 69, 58, 0.1);
+            border: 1px solid rgba(255, 69, 58, 0.3);
+            color: var(--accent-danger);
+        }
+
+        /* Audit log */
+        .audit-table th {
+            text-align: left;
+            font-size: 11px;
+            color: var(--text-3);
+        }
+
+        .audit-table td {
+            font-size: 12px;
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        /* Download modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            display: none;
+        }
+
+        .modal-card {
+            background: #111;
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 36px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .modal-sub {
+            font-size: 13px;
+            color: var(--text-2);
+            margin-bottom: 24px;
+        }
     </style>
 </head>
 
 <body>
     <canvas id="particleCanvas"></canvas>
+
+    <!-- Download audit modal -->
+    <div class="modal-overlay" id="downloadModal">
+        <div class="modal-card glass">
+            <div class="modal-title">📥 Descargar Excel</div>
+            <div class="modal-sub">Por seguridad registramos quién descarga el reporte.</div>
+            <div class="form-group">
+                <label class="form-label">Tu nombre completo</label>
+                <input class="form-input" id="dlName" type="text" placeholder="Ej. Luis García">
+            </div>
+            <div style="display:flex;gap:10px;margin-top:8px">
+                <button class="btn btn-secondary" onclick="closeDownloadModal()" style="flex:1">Cancelar</button>
+                <button class="btn btn-primary" onclick="confirmDownload()" style="flex:1">Descargar →</button>
+            </div>
+        </div>
+    </div>
+
     <nav class="nav">
         <div class="nav-brand">RProDash</div>
         <div class="nav-actions">
@@ -94,22 +201,23 @@
                 <button class="tab active" data-panel="panelResumen" onclick="switchTab(this)">📊 Resumen</button>
                 <button class="tab" data-panel="panelGraficas" onclick="switchTab(this)">📈 Gráficas</button>
                 <button class="tab" data-panel="panelMapa" onclick="switchTab(this)">🗺 Mapa</button>
+                <button class="tab" data-panel="panelExcel" onclick="switchTab(this)">📁 Excel</button>
+                <button class="tab" data-panel="panelAudit" onclick="switchTab(this)">🔐 Auditoría</button>
             </div>
             <div id="navAdvisorBadge" class="nav-advisor" style="cursor:pointer;"
                 onclick="window.location.href='index.html'" title="Cambiar asesor"></div>
+            <button class="btn btn-secondary" onclick="sessionStorage.clear();window.location.href='login.html'"
+                style="font-size:12px">🔒</button>
         </div>
     </nav>
 
     <div class="app-wrapper">
         <div class="page-content">
 
-            <!-- ── Tab: Resumen ── -->
+            <!-- ── Resumen ── -->
             <div class="tab-panel active" id="panelResumen">
-                <!-- KPIs -->
                 <div class="kpi-grid" id="kpiGrid"></div>
-
-                <!-- Filters -->
-                <div class="filter-bar" id="filterBar">
+                <div class="filter-bar">
                     <select class="filter-select" id="fAsesor" onchange="applyFilters()">
                         <option value="">Todos los asesores</option>
                     </select>
@@ -128,18 +236,18 @@
                     </select>
                     <button class="btn btn-secondary" style="font-size:13px" onclick="resetFilters()">✕ Limpiar</button>
                 </div>
-
-                <!-- Table -->
                 <div class="section-header">
                     <div class="section-title2">Escuelas <span id="countBadge" class="badge badge-gray"
                             style="font-size:14px;margin-left:6px;"></span></div>
                     <div style="display:flex;gap:10px">
-                        <a href="profile.html" class="btn btn-secondary" style="font-size:13px;">Mi perfil</a>
+                        <a href="profile.html" class="btn btn-secondary" style="font-size:13px">Mi perfil</a>
+                        <button class="btn btn-primary" onclick="openDownloadModal()" style="font-size:13px">📥
+                            Exportar</button>
                     </div>
                 </div>
                 <div class="table-glass">
                     <div class="table-wrapper">
-                        <table class="data-table" id="mainTable">
+                        <table class="data-table">
                             <thead>
                                 <tr>
                                     <th>Escuela</th>
@@ -159,7 +267,7 @@
                 </div>
             </div>
 
-            <!-- ── Tab: Gráficas ── -->
+            <!-- ── Gráficas ── -->
             <div class="tab-panel" id="panelGraficas">
                 <div class="chart-grid">
                     <div class="glass chart-card">
@@ -181,24 +289,88 @@
                 </div>
             </div>
 
-            <!-- ── Tab: Mapa ── -->
+            <!-- ── Mapa ── -->
             <div class="tab-panel" id="panelMapa">
-                <div class="glass" style="padding:24px; margin-bottom:20px;">
-                    <div class="section-title2" style="margin-bottom:16px;">Territorios por Asesor</div>
+                <div class="glass" style="padding:24px;margin-bottom:20px;">
+                    <div class="section-title2" style="margin-bottom:16px">Territorios por Asesor</div>
                     <div class="map-legend" id="mapLegend"></div>
                 </div>
-                <div class="glass" style="padding:24px; position:relative;">
+                <div class="glass" style="padding:24px;position:relative;">
                     <div id="mapTooltip" class="map-tooltip"></div>
                     <svg id="mapSvg" viewBox="0 0 1200 900" xmlns="http://www.w3.org/2000/svg"></svg>
                 </div>
             </div>
 
+            <!-- ── Excel ── -->
+            <div class="tab-panel" id="panelExcel">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;" class="excel-grid">
+                    <!-- Export -->
+                    <div class="glass" style="padding:28px">
+                        <div class="section-title2" style="margin-bottom:8px">📥 Exportar a Excel</div>
+                        <p style="font-size:13px;color:var(--text-2);margin-bottom:20px">Descarga todos los datos del
+                            sistema en formato .xlsx listo para abrir en Excel.</p>
+                        <button class="btn btn-primary" onclick="openDownloadModal()"
+                            style="width:100%;justify-content:center">Descargar reporte completo</button>
+                        <button class="btn btn-secondary" onclick="downloadTemplate()"
+                            style="width:100%;justify-content:center;margin-top:10px">📄 Descargar plantilla de
+                            importación</button>
+                    </div>
+                    <!-- Import -->
+                    <div class="glass" style="padding:28px">
+                        <div class="section-title2" style="margin-bottom:8px">📤 Importar desde Excel</div>
+                        <p style="font-size:13px;color:var(--text-2);margin-bottom:16px">Usa la plantilla oficial. Si
+                            existe la escuela (mismo nombre + asesor), se actualiza. Si no, se crea nueva.</p>
+                        <div class="import-drop" id="importDrop"
+                            onclick="document.getElementById('importFile').click()">
+                            <div style="font-size:32px;margin-bottom:8px">📂</div>
+                            Haz clic o arrastra tu archivo .xlsx aquí
+                        </div>
+                        <input type="file" id="importFile" accept=".xlsx,.xls,.csv" style="display:none"
+                            onchange="handleImportFile(this)">
+                        <div class="import-result import-ok" id="importOk"></div>
+                        <div class="import-result import-err" id="importErr"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Auditoría ── -->
+            <div class="tab-panel" id="panelAudit">
+                <div class="section-header">
+                    <div class="section-title2">🔐 Historial de descargas</div>
+                    <button class="btn btn-secondary" onclick="renderAudit()" style="font-size:13px">↻
+                        Actualizar</button>
+                </div>
+                <div class="table-glass">
+                    <div class="table-wrapper">
+                        <table class="data-table audit-table">
+                            <thead>
+                                <tr>
+                                    <th>Fecha/Hora</th>
+                                    <th>Nombre</th>
+                                    <th>Archivo</th>
+                                    <th>IP</th>
+                                    <th>Dispositivo</th>
+                                </tr>
+                            </thead>
+                            <tbody id="auditBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <a href="capture.html" class="fab" title="Nueva captura">+</a>
 
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <!-- SheetJS -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <script src="firebase.js"></script>
     <script src="app.js"></script>
     <script src="dashboard.js"></script>
 </body>

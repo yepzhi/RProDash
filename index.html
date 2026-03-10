@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RProDash — Selecciona tu perfil</title>
-    <meta name="description" content="CRM de seguimiento escolar para asesores comerciales">
     <link rel="stylesheet" href="styles.css">
     <style>
         .login-wrap {
@@ -51,13 +50,23 @@
             text-align: center;
             margin-top: 24px;
             font-weight: 600;
-            letter-spacing: 0.5px;
+        }
+
+        .logout-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 200;
+            font-size: 12px;
         }
     </style>
 </head>
 
 <body>
     <canvas id="particleCanvas"></canvas>
+    <button class="btn btn-secondary logout-btn" onclick="sessionStorage.clear();window.location.href='login.html'">🔒
+        Salir</button>
+
     <div class="login-wrap">
         <div class="login-header">
             <div class="login-logo">RProDash</div>
@@ -65,13 +74,15 @@
         </div>
         <div class="login-grid">
             <div class="advisor-grid" id="advisorGrid"></div>
-            <div class="advisor-count">10 asesores · Selecciona tu perfil para continuar</div>
+            <div class="advisor-count">Selecciona tu perfil para continuar</div>
         </div>
     </div>
 
+    <script src="firebase.js"></script>
     <script src="app.js"></script>
     <script>
-        // Render advisor cards
+        if (!requireAuth()) { /* redirects to login.html */ }
+
         const grid = document.getElementById('advisorGrid');
         const current = getCurrentAdvisor();
 
@@ -82,16 +93,13 @@
             const card = document.createElement('div');
             card.className = 'advisor-card' + (current === name ? ' active-advisor' : '');
             card.innerHTML = `
-        <div class="advisor-avatar" style="background: linear-gradient(135deg, ${color}99, ${color}44); border: 2px solid ${color}55;">
+        <div class="advisor-avatar" style="background:linear-gradient(135deg,${color}99,${color}33);border:2px solid ${color}55;">
           <span style="color:${color}">${initial}</span>
         </div>
         <div class="advisor-name">${name}</div>
         <div class="advisor-meta">${schools.length} escuela${schools.length !== 1 ? 's' : ''}</div>
       `;
-            card.addEventListener('click', () => {
-                setCurrentAdvisor(name);
-                window.location.href = 'dashboard.html';
-            });
+            card.addEventListener('click', () => { setCurrentAdvisor(name); window.location.href = 'dashboard.html'; });
             grid.appendChild(card);
         });
 
