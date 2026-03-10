@@ -33,13 +33,8 @@ function updateProgress() {
 
 function renderStep(step, direction = 'forward') {
   const container = document.getElementById('stepContainer');
-
-  if (container.firstChild) {
-    container.firstChild.classList.add('step-exit');
-    setTimeout(() => { container.innerHTML = ''; buildStep(step); }, 280);
-  } else {
-    buildStep(step);
-  }
+  container.innerHTML = ''; // Clear immediately
+  buildStep(step);          // Build new step immediately
   updateProgress();
 }
 
