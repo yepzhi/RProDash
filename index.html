@@ -355,6 +355,7 @@
     async function initDashboard() {
       // Fetch latest from Firebase first
       allSch = await getSchoolsAsync();
+      await getAdvisorsAsync();
 
       // Build grid (Global + Advisors)
       const grid = document.getElementById('advisorGrid');

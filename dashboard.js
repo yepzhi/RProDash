@@ -27,6 +27,7 @@ async function boot() {
     }
 
     allSchools = await getSchoolsAsync();
+    await getAdvisorsAsync();
     filteredSchools = [...allSchools];
 
     buildFilterOptions();

@@ -166,6 +166,26 @@ function getAllAdvisorStates() {
     return JSON.parse(localStorage.getItem('rprodash_advisors') || '{}');
 }
 
+async function getAdvisorsAsync() {
+    const _db = getDb();
+    if (_db) {
+        try {
+            const snap = await _db.collection('advisors').get();
+            const advisorsData = {};
+            const photosData = {};
+            snap.docs.forEach(d => {
+                const data = d.data();
+                if (data.estados) advisorsData[d.id] = { estados: data.estados };
+                if (data.photo) photosData[d.id] = data.photo;
+            });
+            localStorage.setItem('rprodash_advisors', JSON.stringify(advisorsData));
+            localStorage.setItem('rprodash_photos', JSON.stringify(photosData));
+            return advisorsData;
+        } catch (e) { console.warn('Firestore advisors read failed:', e); }
+    }
+    return getAllAdvisorStates();
+}
+
 // ─────────────────────────────────────────────
 //  AUDIT LOG (download tracking)
 // ─────────────────────────────────────────────

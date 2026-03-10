@@ -23,16 +23,29 @@ async function boot() {
   const color = advisorColor(advisor);
   const initial = ADVISOR_INITIALS[advisor];
 
+  const tmpSchools = await getSchoolsAsync();
+  await getAdvisorsAsync(); // Ensure states and photos are fresh
+
+  advisorStates = getAdvisorProfile(advisor).estados || [];
+
   // Avatar
   const av = document.getElementById('profileAvatar');
-  av.style.background = `linear-gradient(135deg, ${color}88, ${color}33)`;
-  av.style.border = `2px solid ${color}66`;
-  av.style.color = color;
-  av.textContent = initial;
+  const photo = getAdvisorPhoto(advisor);
+
+  if (photo) {
+    av.style.background = 'transparent';
+    av.style.border = `2px solid ${color}66`;
+    av.textContent = '';
+    av.innerHTML = `<img src="${photo}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+  } else {
+    av.style.background = `linear-gradient(135deg, ${color}88, ${color}33)`;
+    av.style.border = `2px solid ${color}66`;
+    av.style.color = color;
+    av.textContent = initial;
+  }
 
   document.getElementById('profileName').textContent = advisor;
 
-  const tmpSchools = await getSchoolsAsync();
   allSchools = tmpSchools.filter(s => s.asesor === advisor);
   filteredSchools = [...allSchools];
 
@@ -219,6 +232,25 @@ function saveStates() {
 
 function escapeHtml(str) {
   return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function handlePhotoUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const base64 = e.target.result;
+    saveAdvisorPhoto(advisor, base64);
+
+    const av = document.getElementById('profileAvatar');
+    const color = advisorColor(advisor);
+    av.style.background = 'transparent';
+    av.style.border = `2px solid ${color}66`;
+    av.textContent = '';
+    av.innerHTML = `<img src="${base64}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
 }
 
 boot();
