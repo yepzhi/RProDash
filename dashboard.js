@@ -425,11 +425,46 @@ async function openDownloadModalTemplate() {
     const sampleRow = [
         'Luis', 'Escuela Ejemplo', 'conquista', 'regular', 'Diagnóstico 20%', '1000', '333', 'cuatrimestral', '185', 'directo', '', '2025-01-01', '2025-01-01'
     ];
+
+    // ── Sheet 1: Plantilla ──
     const ws = XLSX.utils.aoa_to_sheet([headers, sampleRow]);
+
+    // Column widths
+    ws['!cols'] = headers.map(() => ({ wch: 22 }));
+
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Plantilla');
+
+    // ── Sheet 2: Instrucciones ──
+    const instrucciones = [
+        ['INSTRUCCIONES DE CAPTURA MASIVA — RProDash'],
+        [''],
+        ['IMPORTANTE: El campo "Asesor" debe escribirse EXACTAMENTE como aparece en el sistema.'],
+        ['El sistema usa el nombre para identificar a qué asesor pertenece cada escuela.'],
+        ['Si el nombre no coincide exactamente, la captura NO se asignará correctamente.'],
+        [''],
+        ['Nombres válidos (copia uno tal cual en la columna Asesor):'],
+        ...ADVISORS.map(a => ['   ' + a]),
+        [''],
+        ['Valores válidos para otros campos:'],
+        ['Tipo:          usuario | conquista'],
+        ['Tipo Compra:   pro | regular'],
+        ['Periodicidad:  semestral | cuatrimestral | anual'],
+        ['Canal:         directo | distribuidor'],
+        ['Etapas (usuario):     Usuario Estable | Usuario en Riesgo'],
+        ['Etapas (conquista):   Diagnóstico 20% | Material / Samples enviados 40% |'],
+        ['                      Propuesta académica enviada 60% | Propuesta académica-comercial 80% |'],
+        ['                      Pilotaje 90% | Facturando — Conquista 100%'],
+        [''],
+        ['Si tienes dudas, contacta al administrador del sistema.'],
+    ];
+    const wsInstr = XLSX.utils.aoa_to_sheet(instrucciones);
+    wsInstr['!cols'] = [{ wch: 80 }];
+    XLSX.utils.book_append_sheet(wb, wsInstr, 'Instrucciones');
+
     XLSX.writeFile(wb, 'plantilla_importacion.xlsx');
 }
+
 
 // ── Bulk Import ──
 function handleImportFile(input) {
@@ -493,7 +528,7 @@ function renderAudit() {
     const tbody = document.getElementById('auditBody');
     const logs = getAuditLog();
     if (!logs.length) {
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text-3)">Sin registros de descarga.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-3)">Sin registros de descarga.</td></tr>`;
         return;
     }
     tbody.innerHTML = logs.map(l => `<tr>
@@ -501,8 +536,10 @@ function renderAudit() {
         <td><strong>${esc(l.userName)}</strong></td>
         <td>${esc(l.fileName)}</td>
         <td><code style="color:var(--accent-2)">${esc(l.ip)}</code></td>
-        <td style="font-size:11px;color:var(--text-3);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(l.ua)}</td>
+        <td style="font-size:12px;color:var(--text-2)">${esc(l.location || l.city || '—')}</td>
+        <td style="font-size:11px;color:var(--text-3);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(l.ua)}</td>
     </tr>`).join('');
 }
+
 
 boot();

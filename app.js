@@ -165,21 +165,33 @@ function getAllAdvisorStates() {
 // ─────────────────────────────────────────────
 //  AUDIT LOG (download tracking)
 // ─────────────────────────────────────────────
-async function getPublicIP() {
+async function getIPInfo() {
     try {
-        const r = await fetch('https://api.ipify.org?format=json');
+        const r = await fetch('https://ipapi.co/json/');
         const j = await r.json();
-        return j.ip || '—';
-    } catch { return '—'; }
+        return {
+            ip: j.ip || '—',
+            city: j.city || '—',
+            region: j.region || '—',
+            country: j.country_name || '—',
+            location: `${j.city || ''}, ${j.region || ''}, ${j.country_name || ''}`.replace(/^, |, $/, ''),
+        };
+    } catch {
+        return { ip: '—', city: '—', region: '—', country: '—', location: '—' };
+    }
 }
 
 async function logDownload(userName, fileName) {
-    const ip = await getPublicIP();
+    const geo = await getIPInfo();
     const entry = {
         id: generateId(),
         userName,
         fileName,
-        ip,
+        ip: geo.ip,
+        location: geo.location,
+        city: geo.city,
+        region: geo.region,
+        country: geo.country,
         ts: new Date().toISOString(),
         ua: navigator.userAgent,
     };
@@ -189,6 +201,7 @@ async function logDownload(userName, fileName) {
     if (db) db.collection('audit').doc(entry.id).set(entry).catch(console.warn);
     return entry;
 }
+
 
 function getAuditLog() {
     return JSON.parse(localStorage.getItem('rprodash_audit') || '[]');
