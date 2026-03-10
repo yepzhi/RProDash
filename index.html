@@ -268,7 +268,13 @@
 
   <nav class="top-nav">
     <div class="brand">RProDash</div>
-    <div class="nav-right">
+    <div class="nav-right" style="display:flex; gap:10px; align-items:center;">
+      <div class="tabs" style="margin-right:12px">
+        <button class="tab active" style="cursor:default">Resumen</button>
+        <button class="tab" onclick="window.location.href='dashboard.html?tab=panelGraficas'">Gráficas</button>
+        <button class="tab" onclick="window.location.href='dashboard.html?tab=panelMapa'">Mapa</button>
+        <button class="tab" onclick="window.location.href='dashboard.html?tab=panelExcel'">Excel</button>
+      </div>
       <button class="btn btn-secondary" onclick="sessionStorage.clear();window.location.href='login.html'"
         style="font-size:12px">Salir</button>
     </div>

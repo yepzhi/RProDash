@@ -30,6 +30,14 @@ function boot() {
     buildCharts();
     buildMap();
     initParticles('particleCanvas', color);
+
+    // Auto-switch to tab if provided in URL (e.g. ?tab=panelGraficas)
+    const urlParams = new URLSearchParams(window.location.search);
+    const targetTab = urlParams.get('tab');
+    if (targetTab) {
+        const btn = document.querySelector(`.tab[data-panel="${targetTab}"]`);
+        if (btn) switchTab(btn);
+    }
 }
 
 // ── Tabs ──
@@ -333,8 +341,8 @@ function buildMap() {
                     tooltip.style.left = (event.pageX + 14) + 'px';
                     tooltip.style.top = (event.pageY - 30) + 'px';
                     tooltip.innerHTML = `<strong>${sName}</strong><br>${owner
-                            ? `<span style="color:${color}">● ${owner}</span> · ${schools} escuela${schools !== 1 ? 's' : ''}`
-                            : '<span style="color:#636366">Sin asignar</span>'
+                        ? `<span style="color:${color}">● ${owner}</span> · ${schools} escuela${schools !== 1 ? 's' : ''}`
+                        : '<span style="color:#636366">Sin asignar</span>'
                         }`;
                 })
                 .on('mousemove', function (event) {
