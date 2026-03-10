@@ -235,7 +235,8 @@ function isAuthenticated() {
 }
 
 function authenticate(pin) {
-    if (pin === MASTER_PIN) {
+    const cleanPin = (pin || '').replace(/\s/g, ''); // strip spaces that mobile keyboards might add
+    if (cleanPin === MASTER_PIN) {
         sessionStorage.setItem('rprodash_auth', '1');
         return true;
     }
