@@ -147,12 +147,12 @@ function renderTable() {
         <span style="width:8px;height:8px;border-radius:50%;background:${color};display:inline-block;flex-shrink:0"></span>
         ${esc(s.asesor)}
       </span></td>
-      <td><span class="badge ${s.tipo === 'usuario' ? 'badge-blue' : 'badge-orange'}">${s.tipo === 'usuario' ? '📚 Usuario' : '🎯 Conquista'}</span></td>
+      <td><span class="badge ${s.tipo === 'usuario' ? 'badge-blue' : 'badge-orange'}">${s.tipo === 'usuario' ? ' Usuario' : ' Conquista'}</span></td>
       <td><span class="badge" style="background:${etColor}22;color:${etColor}">${esc(s.etapa) || '—'}</span></td>
       <td style="text-align:right">${formatNumber(s.alumnos_periodo)}</td>
       <td style="text-align:right">${formatCurrency(s.precioNeto)}</td>
       <td style="text-align:right;font-weight:700;color:var(--accent)">${formatCurrency(venta)}</td>
-      <td>${s.distribuidor === 'distribuidor' ? `🔗 ${esc(s.nombreDistribuidor || '')}` : '🏢 Directo'}</td>
+      <td>${s.distribuidor === 'distribuidor' ? ` ${esc(s.nombreDistribuidor || '')}` : ' Directo'}</td>
       <td style="color:var(--text-3);font-size:12px">${formatDate(s.updatedAt)}</td>
     </tr>`;
     }).join('');
@@ -178,7 +178,7 @@ function buildCharts() {
     chartRegistry.tipo = new Chart(document.getElementById('chartTipo'), {
         type: 'doughnut',
         data: {
-            labels: ['📚 Usuario', '🎯 Conquista'],
+            labels: [' Usuario', ' Conquista'],
             datasets: [{ data: [u, c], backgroundColor: ['#0a84ff', '#ff9f0a'], borderWidth: 0 }]
         },
         options: { ...CHART_DEFAULTS, cutout: '65%' }
@@ -461,7 +461,7 @@ function handleImportFile(input) {
             renderKPIs(); renderTable();
 
             const okEl = document.getElementById('importOk');
-            okEl.textContent = `✅ Importación completa: ${result.added} nuevas, ${result.updated} actualizadas.${result.errors.length ? ' Errores: ' + result.errors.join('; ') : ''}`;
+            okEl.textContent = ` Importación completa: ${result.added} nuevas, ${result.updated} actualizadas.${result.errors.length ? ' Errores: ' + result.errors.join('; ') : ''}`;
             okEl.style.display = 'block';
             document.getElementById('importErr').style.display = 'none';
         } catch (err) {

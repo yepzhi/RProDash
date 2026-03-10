@@ -93,7 +93,7 @@ function filterSchools() {
 function renderSchools() {
   const el = document.getElementById('schoolsList');
   if (!filteredSchools.length) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-icon">🏫</div><div class="empty-title">Sin escuelas</div><p>Aún no has capturado ninguna escuela.</p></div>`;
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon"></div><div class="empty-title">Sin escuelas</div><p>Aún no has capturado ninguna escuela.</p></div>`;
     return;
   }
 
@@ -107,20 +107,20 @@ function renderSchools() {
         <div>
           <div class="school-name">${escapeHtml(s.nombre || '—')}</div>
           <div class="school-meta">
-            <span class="badge ${s.tipo === 'usuario' ? 'badge-blue' : 'badge-orange'}">${s.tipo === 'usuario' ? '📚 Usuario' : '🎯 Conquista'}</span>
+            <span class="badge ${s.tipo === 'usuario' ? 'badge-blue' : 'badge-orange'}">${s.tipo === 'usuario' ? ' Usuario' : ' Conquista'}</span>
             <span class="badge badge-gray">${s.tipoCompra === 'pro' ? 'Pro' : 'Regular'}</span>
             <span class="badge" style="background:${etColor}22;color:${etColor}">${s.etapa || '—'}</span>
           </div>
         </div>
         <div style="display:flex;gap:8px;flex-shrink:0">
-          <button class="btn btn-secondary" style="font-size:12px;padding:7px 14px" onclick="editSchool('${s.id}')">✏️ Editar</button>
-          <button class="btn btn-danger" style="font-size:12px;padding:7px 14px" onclick="confirmDelete('${s.id}')">🗑</button>
+          <button class="btn btn-secondary" style="font-size:12px;padding:7px 14px" onclick="editSchool('${s.id}')"> Editar</button>
+          <button class="btn btn-danger" style="font-size:12px;padding:7px 14px" onclick="confirmDelete('${s.id}')"></button>
         </div>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:20px;font-size:13px;color:var(--text-2);margin-top:8px">
-        <span>👩‍🎓 <strong style="color:var(--text)">${formatNumber(s.alumnos_periodo)}</strong> alumnos/periodo</span>
-        <span>💰 <strong style="color:var(--accent)">${formatCurrency(venta)}</strong> proyectado</span>
-        <span>🔗 ${s.distribuidor === 'distribuidor' ? `Dist. ${escapeHtml(s.nombreDistribuidor || '')}` : 'Directo'}</span>
+        <span> <strong style="color:var(--text)">${formatNumber(s.alumnos_periodo)}</strong> alumnos/periodo</span>
+        <span> <strong style="color:var(--accent)">${formatCurrency(venta)}</strong> proyectado</span>
+        <span> ${s.distribuidor === 'distribuidor' ? `Dist. ${escapeHtml(s.nombreDistribuidor || '')}` : 'Directo'}</span>
         <span style="color:var(--text-3)">Actualizado ${formatDate(s.updatedAt)}</span>
       </div>
     </div>`;
@@ -132,8 +132,50 @@ function editSchool(id) {
 }
 
 function confirmDelete(id) {
-  if (confirm('¿Eliminar esta escuela? Esta acción no se puede deshacer.')) {
-    deleteSchool(id);
+  const school = getSchoolById(id);
+  if (!school) return;
+  deleteSchool(id);
+  allSchools = getSchools().filter(s => s.asesor === advisor);
+  filteredSchools = [...allSchools];
+  renderStats(); renderMiniKpis(); renderSchools();
+  showUndoToast(school.nombre || 'Escuela');
+}
+
+let undoTimer = null;
+function showUndoToast(nombre) {
+  clearTimeout(undoTimer);
+  let toast = document.getElementById('undoToast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'undoToast';
+    toast.style.cssText = `
+      position:fixed; bottom:90px; left:50%; transform:translateX(-50%);
+      background:#1c1c1e; border:1px solid rgba(255,255,255,0.12);
+      border-radius:14px; padding:14px 20px;
+      display:flex; align-items:center; gap:14px;
+      font-size:14px; color:#f5f5f7; z-index:999;
+      box-shadow:0 8px 32px rgba(0,0,0,0.5);
+      animation: fadeIn 0.25s ease;
+    `;
+    document.body.appendChild(toast);
+  }
+  const color = advisorColor(advisor);
+  toast.innerHTML = `
+    <span style="color:var(--text-2)">"${nombre}" eliminada</span>
+    <button onclick="undoDelete()" style="
+      background:${color}; color:#fff; border:none; border-radius:8px;
+      padding:6px 16px; font-size:13px; font-weight:700; cursor:pointer;
+    ">Deshacer</button>
+  `;
+  toast.style.display = 'flex';
+  undoTimer = setTimeout(() => { toast.style.display = 'none'; }, 8000);
+}
+
+function undoDelete() {
+  clearTimeout(undoTimer);
+  document.getElementById('undoToast').style.display = 'none';
+  const restored = restoreLastDeleted();
+  if (restored) {
     allSchools = getSchools().filter(s => s.asesor === advisor);
     filteredSchools = [...allSchools];
     renderStats(); renderMiniKpis(); renderSchools();

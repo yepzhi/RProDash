@@ -41,7 +41,7 @@ if (FIREBASE_READY) {
   try {
     if (!firebase.apps?.length) firebase.initializeApp(FIREBASE_CONFIG);
     db = firebase.firestore();
-    console.info('[RProDash] ✅ Firebase conectado a proyecto:', FIREBASE_CONFIG.projectId);
+    console.info('[RProDash]  Firebase conectado a proyecto:', FIREBASE_CONFIG.projectId);
   } catch (e) {
     console.warn('[RProDash] ⚠️ Firebase error, usando localStorage:', e.message);
   }

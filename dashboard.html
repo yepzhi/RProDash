@@ -181,7 +181,7 @@
     <!-- Download audit modal -->
     <div class="modal-overlay" id="downloadModal">
         <div class="modal-card glass">
-            <div class="modal-title">📥 Descargar Excel</div>
+            <div class="modal-title">Descargar Excel</div>
             <div class="modal-sub">Por seguridad registramos quién descarga el reporte.</div>
             <div class="form-group">
                 <label class="form-label">Tu nombre completo</label>
@@ -198,16 +198,16 @@
         <div class="nav-brand">RProDash</div>
         <div class="nav-actions">
             <div class="tabs" id="mainTabs">
-                <button class="tab active" data-panel="panelResumen" onclick="switchTab(this)">📊 Resumen</button>
-                <button class="tab" data-panel="panelGraficas" onclick="switchTab(this)">📈 Gráficas</button>
-                <button class="tab" data-panel="panelMapa" onclick="switchTab(this)">🗺 Mapa</button>
-                <button class="tab" data-panel="panelExcel" onclick="switchTab(this)">📁 Excel</button>
-                <button class="tab" data-panel="panelAudit" onclick="switchTab(this)">🔐 Auditoría</button>
+                <button class="tab active" data-panel="panelResumen" onclick="switchTab(this)"> Resumen</button>
+                <button class="tab" data-panel="panelGraficas" onclick="switchTab(this)"> Gráficas</button>
+                <button class="tab" data-panel="panelMapa" onclick="switchTab(this)"> Mapa</button>
+                <button class="tab" data-panel="panelExcel" onclick="switchTab(this)"> Excel</button>
+                <button class="tab" data-panel="panelAudit" onclick="switchTab(this)"> Auditoría</button>
             </div>
             <div id="navAdvisorBadge" class="nav-advisor" style="cursor:pointer;"
                 onclick="window.location.href='index.html'" title="Cambiar asesor"></div>
             <button class="btn btn-secondary" onclick="sessionStorage.clear();window.location.href='login.html'"
-                style="font-size:12px">🔒</button>
+                style="font-size:12px"></button>
         </div>
     </nav>
 
@@ -312,17 +312,17 @@
                         <button class="btn btn-primary" onclick="openDownloadModal()"
                             style="width:100%;justify-content:center">Descargar reporte completo</button>
                         <button class="btn btn-secondary" onclick="downloadTemplate()"
-                            style="width:100%;justify-content:center;margin-top:10px">📄 Descargar plantilla de
+                            style="width:100%;justify-content:center;margin-top:10px"> Descargar plantilla de
                             importación</button>
                     </div>
                     <!-- Import -->
                     <div class="glass" style="padding:28px">
-                        <div class="section-title2" style="margin-bottom:8px">📤 Importar desde Excel</div>
+                        <div class="section-title2" style="margin-bottom:8px">Importar desde Excel</div>
                         <p style="font-size:13px;color:var(--text-2);margin-bottom:16px">Usa la plantilla oficial. Si
                             existe la escuela (mismo nombre + asesor), se actualiza. Si no, se crea nueva.</p>
                         <div class="import-drop" id="importDrop"
                             onclick="document.getElementById('importFile').click()">
-                            <div style="font-size:32px;margin-bottom:8px">📂</div>
+                            <div style="font-size:32px;margin-bottom:8px"></div>
                             Haz clic o arrastra tu archivo .xlsx aquí
                         </div>
                         <input type="file" id="importFile" accept=".xlsx,.xls,.csv" style="display:none"
@@ -336,7 +336,7 @@
             <!-- ── Auditoría ── -->
             <div class="tab-panel" id="panelAudit">
                 <div class="section-header">
-                    <div class="section-title2">🔐 Historial de descargas</div>
+                    <div class="section-title2">Historial de descargas</div>
                     <button class="btn btn-secondary" onclick="renderAudit()" style="font-size:13px">↻
                         Actualizar</button>
                 </div>

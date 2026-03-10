@@ -69,9 +69,45 @@ function saveSchool(school) {
 }
 
 function deleteSchool(id) {
+    // Save to trash before deleting (keep last 20)
+    const school = getSchoolById(id);
+    if (school) {
+        const trash = JSON.parse(localStorage.getItem('rprodash_trash') || '[]');
+        trash.unshift({ ...school, deletedAt: new Date().toISOString() });
+        localStorage.setItem('rprodash_trash', JSON.stringify(trash.slice(0, 20)));
+        // Soft-delete in Firestore (add deletedAt flag so it can be restored)
+        if (db) db.collection('trash').doc(school.id).set({ ...school, deletedAt: new Date().toISOString() }).catch(console.warn);
+    }
     const schools = getSchools().filter(s => s.id !== id);
     localStorage.setItem('rprodash_schools', JSON.stringify(schools));
     if (db) db.collection('schools').doc(id).delete().catch(console.warn);
+}
+
+function getTrash() {
+    return JSON.parse(localStorage.getItem('rprodash_trash') || '[]');
+}
+
+function restoreLastDeleted() {
+    const trash = getTrash();
+    if (!trash.length) return null;
+    const school = trash.shift(); // pop most recent
+    localStorage.setItem('rprodash_trash', JSON.stringify(trash));
+    delete school.deletedAt;
+    saveSchool(school); // re-save to active schools
+    if (db) db.collection('trash').doc(school.id).delete().catch(console.warn);
+    return school;
+}
+
+function restoreById(id) {
+    const trash = getTrash();
+    const idx = trash.findIndex(s => s.id === id);
+    if (idx < 0) return null;
+    const school = trash.splice(idx, 1)[0];
+    localStorage.setItem('rprodash_trash', JSON.stringify(trash));
+    delete school.deletedAt;
+    saveSchool(school);
+    if (db) db.collection('trash').doc(school.id).delete().catch(console.warn);
+    return school;
 }
 
 function getSchoolById(id) {

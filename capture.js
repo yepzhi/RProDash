@@ -52,8 +52,8 @@ function buildStep(step) {
     case 0:
       html = `
         <div class="survey-card">
-          <div class="survey-question">¿Quién eres?</div>
-          <div class="survey-sub">Selecciona tu nombre de la lista de asesores.</div>
+          <div class="survey-question">Nombre del asesor</div>
+          <div class="survey-sub">Selecciona tu nombre de la lista.</div>
           <div class="form-group">
             <select class="form-select" id="f_asesor">
               <option value="">— Selecciona asesor —</option>
@@ -92,10 +92,10 @@ function buildStep(step) {
           <div class="survey-sub">¿Es una cuenta activa o la estamos conquistando?</div>
           <div class="toggle-group" style="margin-bottom:20px;">
             <div class="toggle-opt ${formData.tipo === 'usuario' ? 'selected' : ''}" id="tipo_usuario" onclick="selectTipo('usuario')">
-              📚 Usuario
+               Usuario
             </div>
             <div class="toggle-opt ${formData.tipo === 'conquista' ? 'selected' : ''}" id="tipo_conquista" onclick="selectTipo('conquista')">
-              🎯 Conquista
+               Conquista
             </div>
           </div>
           <div class="form-label" style="margin-top: 4px;">Tipo de compra</div>
@@ -171,7 +171,7 @@ function buildStep(step) {
           <div class="form-group">
             <input class="form-input" id="f_precio" type="number" min="0" step="0.01"
               placeholder="Ej. 185.00" value="${formData.precioNeto || ''}">
-            <div class="form-hint">💡 Este es el precio final al cliente (distribuidor o institución), no el precio de venta público al estudiante.</div>
+            <div class="form-hint">Nota: Este es el precio final al cliente (distribuidor o institución), no el precio de venta público al estudiante.</div>
           </div>
           <div class="survey-actions">
             <button class="btn btn-secondary" onclick="prevStep()">← Atrás</button>
@@ -187,8 +187,8 @@ function buildStep(step) {
           <div class="survey-question">Canal de distribución</div>
           <div class="survey-sub">¿La venta es directa con la institución o a través de un distribuidor?</div>
           <div class="toggle-group" style="margin-bottom:20px">
-            <div class="toggle-opt ${formData.distribuidor === 'directo' || !formData.distribuidor ? 'selected' : ''}" id="dist_directo" onclick="selectDist('directo')">🏢 Directo</div>
-            <div class="toggle-opt ${formData.distribuidor === 'distribuidor' ? 'selected' : ''}" id="dist_dist" onclick="selectDist('distribuidor')">🔗 Distribuidor</div>
+            <div class="toggle-opt ${formData.distribuidor === 'directo' || !formData.distribuidor ? 'selected' : ''}" id="dist_directo" onclick="selectDist('directo')"> Directo</div>
+            <div class="toggle-opt ${formData.distribuidor === 'distribuidor' ? 'selected' : ''}" id="dist_dist" onclick="selectDist('distribuidor')"> Distribuidor</div>
           </div>
           <div id="distNameWrap" style="${(formData.distribuidor === 'distribuidor') ? '' : 'display:none'}">
             <div class="form-group">
@@ -211,12 +211,12 @@ function buildStep(step) {
       const venta = alumnos_p * (parseFloat(formData.precioNeto) || 0);
       html = `
         <div class="survey-card">
-          <div class="survey-question">✅ Revisa y guarda</div>
+          <div class="survey-question"> Revisa y guarda</div>
           <div class="survey-sub">Confirma los datos de la escuela antes de guardar.</div>
           <div class="review-grid">
             ${row('Asesor', formData.asesor)}
             ${row('Escuela', formData.nombre)}
-            ${row('Tipo', formData.tipo === 'usuario' ? '📚 Usuario' : '🎯 Conquista')}
+            ${row('Tipo', formData.tipo === 'usuario' ? ' Usuario' : ' Conquista')}
             ${row('Compra', formData.tipoCompra === 'pro' ? 'Pro' : 'Regular')}
             ${row('Etapa', formData.etapa)}
             ${row('Alumnos totales', formatNumber(formData.alumnosTotales))}
@@ -229,7 +229,7 @@ function buildStep(step) {
           <div class="survey-actions" style="margin-top:24px">
             <button class="btn btn-secondary" onclick="prevStep()">← Editar</button>
             <button class="btn btn-primary" onclick="saveCapture()" style="background:var(--accent-2);box-shadow:0 4px 20px rgba(48,209,88,0.35)">
-              Guardar Escuela 💾
+              Guardar Escuela 
             </button>
           </div>
         </div>`;
@@ -334,7 +334,7 @@ function recalcAlumnos() {
   if (al > 0 && per && resEl) {
     const res = calcAlumnosPeriodo(al, per);
     resEl.style.display = '';
-    resEl.innerHTML = `📊 <strong>${formatNumber(res)} alumnos</strong> comprarían libro por periodo (${per}).`;
+    resEl.innerHTML = ` <strong>${formatNumber(res)} alumnos</strong> comprarían libro por periodo (${per}).`;
   } else if (resEl) {
     resEl.style.display = 'none';
   }
