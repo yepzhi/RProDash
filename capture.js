@@ -9,20 +9,24 @@ let formData = {};
 let currentStep = 0;
 let editId = null;
 
-// Check if editing an existing school
 const params = new URLSearchParams(window.location.search);
-if (params.get('edit')) {
-  editId = params.get('edit');
-  const existing = getSchoolById(editId);
-  if (existing) formData = { ...existing };
-}
-
-// Pre-fill advisor from session
-if (!formData.asesor) {
-  formData.asesor = getCurrentAdvisor() || '';
-}
-
 const TOTAL_STEPS = 8;
+
+// Re-fetch before rendering anything
+async function initCapture() {
+  if (params.get('edit')) {
+    editId = params.get('edit');
+    await getSchoolsAsync(); // force fresh cache
+    const existing = getSchoolById(editId);
+    if (existing) formData = { ...existing };
+  }
+
+  if (!formData.asesor) {
+    formData.asesor = getCurrentAdvisor() || '';
+  }
+
+  renderStep(0);
+}
 
 function updateProgress() {
   const pct = ((currentStep + 1) / TOTAL_STEPS) * 100;
@@ -356,4 +360,4 @@ function escapeHtml(str) {
 
 // ── Boot ──
 initParticles('particleCanvas', '#0a84ff');
-renderStep(0);
+initCapture();

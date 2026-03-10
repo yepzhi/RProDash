@@ -18,7 +18,7 @@ let advisorStates = getAdvisorProfile(advisor).estados || [];
 let allSchools = [];
 let filteredSchools = [];
 
-function boot() {
+async function boot() {
   if (!requireAuth()) return;
   const color = advisorColor(advisor);
   const initial = ADVISOR_INITIALS[advisor];
@@ -32,7 +32,8 @@ function boot() {
 
   document.getElementById('profileName').textContent = advisor;
 
-  allSchools = getSchools().filter(s => s.asesor === advisor);
+  const tmpSchools = await getSchoolsAsync();
+  allSchools = tmpSchools.filter(s => s.asesor === advisor);
   filteredSchools = [...allSchools];
 
   renderStats();

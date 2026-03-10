@@ -8,7 +8,7 @@ let allSchools = [];
 let filteredSchools = [];
 
 // ── Boot ──
-function boot() {
+async function boot() {
     if (!requireAuth()) return;
     const advisor = getCurrentAdvisor();
     const color = advisor ? advisorColor(advisor) : '#0a84ff';
@@ -21,7 +21,7 @@ function boot() {
         badge.innerHTML = `<span class="advisor-dot" style="background:var(--accent-2)"></span>Vista Global`;
     }
 
-    allSchools = getSchools();
+    allSchools = await getSchoolsAsync();
     filteredSchools = [...allSchools];
 
     buildFilterOptions();
