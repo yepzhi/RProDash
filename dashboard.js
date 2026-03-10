@@ -255,103 +255,126 @@ function buildCharts() {
     });
 }
 
-// ── Mexico SVG Map ──
-// Simplified state paths (approximate bounding box rectangles for MVP — labeled by state)
-const MEXICO_SVG_STATES = [
-    { id: 'BC', name: 'Baja California', d: 'M 30 80 L 110 80 L 130 160 L 50 160 Z' },
-    { id: 'BCS', name: 'Baja California Sur', d: 'M 55 165 L 115 165 L 90 280 L 60 270 Z' },
-    { id: 'SON', name: 'Sonora', d: 'M 115 80 L 230 80 L 230 200 L 115 200 Z' },
-    { id: 'CHIH', name: 'Chihuahua', d: 'M 230 80 L 370 80 L 370 210 L 230 210 Z' },
-    { id: 'COAH', name: 'Coahuila', d: 'M 370 100 L 480 100 L 480 210 L 370 210 Z' },
-    { id: 'NL', name: 'Nuevo León', d: 'M 480 130 L 560 130 L 560 220 L 480 220 Z' },
-    { id: 'TAMP', name: 'Tamaulipas', d: 'M 560 120 L 650 120 L 650 260 L 560 260 Z' },
-    { id: 'SIN', name: 'Sinaloa', d: 'M 155 195 L 220 195 L 230 320 L 165 310 Z' },
-    { id: 'DGO', name: 'Durango', d: 'M 220 195 L 320 195 L 315 320 L 225 315 Z' },
-    { id: 'ZACT', name: 'Zacatecas', d: 'M 320 200 L 410 200 L 400 300 L 315 295 Z' },
-    { id: 'SLP', name: 'San Luis Potosí', d: 'M 410 200 L 500 200 L 495 290 L 405 285 Z' },
-    { id: 'NAY', name: 'Nayarit', d: 'M 185 305 L 240 305 L 235 370 L 185 360 Z' },
-    { id: 'JAL', name: 'Jalisco', d: 'M 240 305 L 360 305 L 355 395 L 240 390 Z' },
-    { id: 'AGS', name: 'Aguascalientes', d: 'M 355 270 L 395 270 L 392 305 L 355 302 Z' },
-    { id: 'GTO', name: 'Guanajuato', d: 'M 395 300 L 470 300 L 460 355 L 390 350 Z' },
-    { id: 'QRO', name: 'Querétaro', d: 'M 470 295 L 510 295 L 505 340 L 465 337 Z' },
-    { id: 'HGO', name: 'Hidalgo', d: 'M 510 280 L 560 280 L 552 330 L 505 328 Z' },
-    { id: 'COL', name: 'Colima', d: 'M 245 385 L 280 385 L 278 415 L 244 412 Z' },
-    { id: 'MICH', name: 'Michoacán', d: 'M 280 380 L 400 380 L 395 450 L 280 445 Z' },
-    { id: 'MEX', name: 'México', d: 'M 480 330 L 540 330 L 535 390 L 478 386 Z' },
-    { id: 'CDMX', name: 'Ciudad de México', d: 'M 516 372 L 535 372 L 533 392 L 515 390 Z' },
-    { id: 'TLX', name: 'Tlaxcala', d: 'M 540 340 L 570 340 L 567 360 L 538 358 Z' },
-    { id: 'MOR', name: 'Morelos', d: 'M 500 388 L 540 388 L 537 415 L 498 412 Z' },
-    { id: 'PUE', name: 'Puebla', d: 'M 540 340 L 610 340 L 605 420 L 537 416 Z' },
-    { id: 'TLAX', name: 'Tlaxcala', d: 'M 562 330 L 590 330 L 588 342 L 560 340 Z' },
-    { id: 'VER', name: 'Veracruz', d: 'M 580 250 L 650 250 L 660 450 L 580 440 Z' },
-    { id: 'GRO', name: 'Guerrero', d: 'M 385 440 L 510 440 L 515 530 L 385 522 Z' },
-    { id: 'OAX', name: 'Oaxaca', d: 'M 510 430 L 640 430 L 638 530 L 508 525 Z' },
-    { id: 'CHIS', name: 'Chiapas', d: 'M 580 520 L 720 520 L 715 600 L 575 592 Z' },
-    { id: 'TAB', name: 'Tabasco', d: 'M 650 420 L 730 420 L 728 490 L 648 485 Z' },
-    { id: 'CAMP', name: 'Campeche', d: 'M 730 400 L 830 400 L 828 520 L 728 516 Z' },
-    { id: 'YUC', name: 'Yucatán', d: 'M 780 300 L 920 300 L 918 400 L 778 398 Z' },
-    { id: 'QROO', name: 'Quintana Roo', d: 'M 880 340 L 980 340 L 978 580 L 878 575 Z' },
-];
+// ── Real Mexico Map with D3 + TopoJSON ──
+const MEXICO_TOPOJSON_URL = 'https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json'; // fallback
+const MX_GEO_URL = 'https://raw.githubusercontent.com/angelnmara/geojson/master/mexicoHigh.json';
 
 function buildMap() {
-    const svg = document.getElementById('mapSvg');
+    const container = document.getElementById('mapSvg').parentElement;
     const tooltip = document.getElementById('mapTooltip');
     const advisorProfiles = getAllAdvisorStates();
 
-    // Build reverse map: state → advisor
+    // Build reverse map: stateName → advisor
     const stateOwner = {};
     Object.entries(advisorProfiles).forEach(([advisor, profile]) => {
-        (profile.estados || []).forEach(stateName => {
-            stateOwner[stateName] = advisor;
-        });
+        (profile.estados || []).forEach(name => { stateOwner[name] = advisor; });
     });
-
-    // Map name → SVG id
-    const nameLookup = {};
-    MEXICO_SVG_STATES.forEach(s => { nameLookup[s.name] = s.id; });
 
     // Legend
     const usedAdvisors = [...new Set(Object.values(stateOwner))];
-    document.getElementById('mapLegend').innerHTML = usedAdvisors.map(a => `
-    <div class="map-legend-item">
-      <div class="map-legend-dot" style="background:${advisorColor(a)}"></div>
-      <span>${a}</span>
-    </div>
-  `).join('') + '<div class="map-legend-item"><div class="map-legend-dot" style="background:#1c1c1e;border:1px solid rgba(255,255,255,0.15)"></div><span>Sin asignar</span></div>';
+    document.getElementById('mapLegend').innerHTML =
+        usedAdvisors.map(a => `
+            <div class="map-legend-item">
+              <div class="map-legend-dot" style="background:${advisorColor(a)}"></div>
+              <span>${a}</span>
+            </div>`).join('') +
+        `<div class="map-legend-item">
+           <div class="map-legend-dot" style="background:#1c1c1e;border:1px solid rgba(255,255,255,0.15)"></div>
+           <span>Sin asignar</span>
+         </div>`;
 
-    // Draw states
-    svg.innerHTML = '';
-    MEXICO_SVG_STATES.forEach(state => {
-        const ownerByState = Object.entries(stateOwner).find(([sName]) => sName === state.name);
-        const ownerName = ownerByState ? ownerByState[1] : null;
-        const color = ownerName ? advisorColor(ownerName) : null;
+    // Build D3 SVG
+    const svgEl = document.getElementById('mapSvg');
+    svgEl.innerHTML = '<text x="50%" y="50%" text-anchor="middle" fill="#636366" font-size="14">Cargando mapa…</text>';
 
-        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        path.setAttribute('d', state.d);
-        path.setAttribute('id', 'state_' + state.id);
-        if (color) {
-            path.style.fill = color + '88';
-            path.style.stroke = color;
-            path.style.strokeWidth = '1.5';
-        }
+    const w = container.clientWidth || 800;
+    const h = Math.round(w * 0.6);
+    svgEl.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    svgEl.style.width = '100%';
+    svgEl.style.height = 'auto';
 
-        path.addEventListener('mouseenter', (ev) => {
-            const schools = allSchools.filter(s => stateOwner[state.name] === s.asesor).length;
-            tooltip.style.opacity = '1';
-            tooltip.style.left = (ev.pageX + 14) + 'px';
-            tooltip.style.top = (ev.pageY - 30) + 'px';
-            tooltip.innerHTML = `<strong>${state.name}</strong><br>
-        ${ownerName ? `<span style="color:${color}">● ${ownerName}</span>` : '<span style="color:#636366">Sin asignar</span>'}`;
+    fetch(MX_GEO_URL)
+        .then(r => r.json())
+        .then(geoData => {
+            svgEl.innerHTML = '';
+            const svg = d3.select(svgEl);
+            const projection = d3.geoMercator().fitSize([w, h], geoData);
+            const path = d3.geoPath().projection(projection);
+
+            svg.selectAll('path')
+                .data(geoData.features)
+                .enter()
+                .append('path')
+                .attr('d', path)
+                .attr('id', d => 'state_' + (d.properties.ESTADO || d.properties.name || '').replace(/\s/g, '_'))
+                .style('fill', d => {
+                    const sName = d.properties.ESTADO || d.properties.name || '';
+                    const owner = stateOwner[sName];
+                    return owner ? advisorColor(owner) + 'aa' : '#1c1c1e';
+                })
+                .style('stroke', d => {
+                    const sName = d.properties.ESTADO || d.properties.name || '';
+                    const owner = stateOwner[sName];
+                    return owner ? advisorColor(owner) : 'rgba(255,255,255,0.12)';
+                })
+                .style('stroke-width', d => {
+                    const sName = d.properties.ESTADO || d.properties.name || '';
+                    return stateOwner[sName] ? '1.5' : '0.7';
+                })
+                .style('cursor', 'pointer')
+                .style('transition', 'fill 0.2s')
+                .on('mouseover', function (event, d) {
+                    const sName = d.properties.ESTADO || d.properties.name || '';
+                    const owner = stateOwner[sName];
+                    const color = owner ? advisorColor(owner) : null;
+                    const schools = owner ? allSchools.filter(s => s.asesor === owner).length : 0;
+                    d3.select(this).style('fill', owner ? advisorColor(owner) + 'dd' : 'rgba(10,132,255,0.25)');
+                    tooltip.style.opacity = '1';
+                    tooltip.style.left = (event.pageX + 14) + 'px';
+                    tooltip.style.top = (event.pageY - 30) + 'px';
+                    tooltip.innerHTML = `<strong>${sName}</strong><br>${owner
+                            ? `<span style="color:${color}">● ${owner}</span> · ${schools} escuela${schools !== 1 ? 's' : ''}`
+                            : '<span style="color:#636366">Sin asignar</span>'
+                        }`;
+                })
+                .on('mousemove', function (event) {
+                    tooltip.style.left = (event.pageX + 14) + 'px';
+                    tooltip.style.top = (event.pageY - 30) + 'px';
+                })
+                .on('mouseout', function (event, d) {
+                    const sName = d.properties.ESTADO || d.properties.name || '';
+                    const owner = stateOwner[sName];
+                    d3.select(this).style('fill', owner ? advisorColor(owner) + 'aa' : '#1c1c1e');
+                    tooltip.style.opacity = '0';
+                });
+
+            // State labels
+            svg.selectAll('text.state-label')
+                .data(geoData.features.filter(d => {
+                    const b = path.bounds(d);
+                    return (b[1][0] - b[0][0]) > 20 && (b[1][1] - b[0][1]) > 14;
+                }))
+                .enter()
+                .append('text')
+                .attr('class', 'state-label')
+                .attr('transform', d => `translate(${path.centroid(d)})`)
+                .attr('text-anchor', 'middle')
+                .attr('font-size', '9')
+                .attr('fill', 'rgba(255,255,255,0.55)')
+                .attr('pointer-events', 'none')
+                .text(d => {
+                    const name = d.properties.ESTADO || d.properties.name || '';
+                    return name.length > 10 ? name.split(' ')[0] : name;
+                });
+        })
+        .catch(err => {
+            svgEl.innerHTML = `<text x="50%" y="50%" text-anchor="middle" fill="#ff453a" font-size="13">
+                Error cargando mapa. Verifica tu conexión.
+            </text>`;
+            console.warn('Map load error:', err);
         });
-        path.addEventListener('mousemove', (ev) => {
-            tooltip.style.left = (ev.pageX + 14) + 'px';
-            tooltip.style.top = (ev.pageY - 30) + 'px';
-        });
-        path.addEventListener('mouseleave', () => { tooltip.style.opacity = '0'; });
-
-        svg.appendChild(path);
-    });
 }
+
 
 function esc(str) {
     return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
