@@ -6,23 +6,23 @@
 // Safe Firestore handle — works even if Firebase loads after this file
 function getDb() { return typeof db !== 'undefined' ? db : null; }
 
-const ADVISORS = ['Luis', 'Alberto', 'Fabi', 'Edgar', 'Arturo', 'Daniel', 'Miguel', 'Vacante'];
+const ADVISORS = ['Maria', 'Juan', 'Luis', 'Pedro', 'Ana', 'Carlos', 'Sofia', 'Vacante'];
 const MASTER_PIN = 'Pro2610';
 
 const ADVISOR_COLORS = {
-    Luis: '#0a84ff',
-    Alberto: '#30d158',
-    Fabi: '#ff375f',
-    Edgar: '#bf5af2',
-    Arturo: '#ff9f0a',
-    Daniel: '#64d2ff',
-    Miguel: '#ffd60a',
+    Maria: '#ff375f',
+    Juan: '#0a84ff',
+    Luis: '#30d158',
+    Pedro: '#ff9f0a',
+    Ana: '#bf5af2',
+    Carlos: '#64d2ff',
+    Sofia: '#ffd60a',
     Vacante: '#636366',
 };
 
 const ADVISOR_INITIALS = {
-    Luis: 'L', Alberto: 'A', Fabi: 'F', Edgar: 'E',
-    Arturo: 'AR', Daniel: 'D', Miguel: 'M', Vacante: '?',
+    Maria: 'M', Juan: 'J', Luis: 'L', Pedro: 'P',
+    Ana: 'A', Carlos: 'C', Sofia: 'S', Vacante: '?',
 };
 
 const ETAPAS_USUARIO = ['Usuario Estable', 'Usuario en Riesgo'];
@@ -232,25 +232,15 @@ function getAuditLog() {
 //  SESSION / PIN
 // ─────────────────────────────────────────────
 function isAuthenticated() {
-    return sessionStorage.getItem('rprodash_auth') === '1';
+    return true; // Bypassed for Demo
 }
 
 function authenticate(pin) {
-    const cleanPin = (pin || '').replace(/\s/g, '').toLowerCase(); // strip spaces and ignore case
-    if (cleanPin === MASTER_PIN.toLowerCase()) {
-        sessionStorage.setItem('rprodash_auth', '1');
-        return true;
-    }
-    return false;
+    return true; // Bypassed for Demo
 }
 
 function requireAuth() {
-    if (!isAuthenticated()) {
-        const cur = encodeURIComponent(window.location.href);
-        window.location.href = `login.html?next=${cur}`;
-        return false;
-    }
-    return true;
+    return true; // Bypassed for Demo
 }
 
 function getCurrentAdvisor() {
@@ -310,6 +300,78 @@ function hexToRgba(hex, a) {
     const r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
     return `rgba(${r},${g},${b},${a})`;
 }
+
+// ─────────────────────────────────────────────
+//  DEMO SEEDING
+// ─────────────────────────────────────────────
+const MEX_UNIVERSITIES = [
+    'UNAM', 'Tec de Monterrey (ITESM)', 'IPN', 'Iberoamericana (IBERO)', 'Anáhuac México',
+    'UDLAP', 'UANL', 'ITAM', 'Univ. de Guadalajara (UDG)', 'Tecmilenio', 'UVM',
+    'La Salle', 'UPN', 'UAM', 'BUAP', 'UAEM', 'UASLP', 'UACH', 'UADY', 'Univ. Michoacana',
+    'Univ. de Sonora (UNISON)', 'Univ. Veracruzana', 'CIDE', 'COLMEX', 'ITESO',
+    'CETYS Universidad', 'Univ. de Monterrey (UDEM)', 'UP (Panamericana)'
+];
+
+const MEX_STATES = [
+    'CDMX', 'Jalisco', 'Nuevo León', 'Puebla', 'Querétaro', 'Yucatán', 'Sonora',
+    'Chihuahua', 'Guanajuato', 'Estado de México', 'Veracruz', 'Sinaloa'
+];
+
+function seedDemoData(force = false) {
+    if (!force && localStorage.getItem('rprodash_schools')) return;
+
+    const mockSchools = [];
+    const totalGoal = 82000000;
+    let currentTotal = 0;
+    const count = 130;
+
+    for (let i = 0; i < count; i++) {
+        const uni = MEX_UNIVERSITIES[Math.floor(Math.random() * MEX_UNIVERSITIES.length)];
+        const campus = ['Norte', 'Sur', 'Poniente', 'Oriente', 'Centro', 'Sta. Fé', 'Interlomas', 'Valle'][Math.floor(Math.random() * 8)];
+        const advisor = ADVISORS[Math.floor(Math.random() * (ADVISORS.length - 1))]; // Not Vacante
+        const estado = MEX_STATES[Math.floor(Math.random() * MEX_STATES.length)];
+        const periodicidad = ['anual', 'semestral', 'cuatrimestral'][Math.floor(Math.random() * 3)];
+        
+        // Ranges adjusted for ~80M total across 130 schools
+        let alumnosTotales = Math.floor(Math.random() * 600) + 200; // 200-800
+        let precioNeto = Math.floor(Math.random() * 2000) + 1500; // 1500-3500
+        
+        // Randomize stages
+        const isConquest = Math.random() > 0.4;
+        const etapa = isConquest 
+            ? ETAPAS_CONQUISTA[Math.floor(Math.random() * ETAPAS_CONQUISTA.length)]
+            : ETAPAS_USUARIO[Math.floor(Math.random() * ETAPAS_USUARIO.length)];
+
+        const school = {
+            id: 'demo-' + i,
+            nombre: `${uni} — Campus ${campus}`,
+            asesor: advisor,
+            estado: estado,
+            nivel: ['K-12', 'Higher Ed', 'Idiomas'][Math.floor(Math.random() * 3)],
+            tipo: isConquest ? 'Conquista' : 'Usuario',
+            etapa: etapa,
+            periodicidad: periodicidad,
+            alumnosTotales: alumnosTotales,
+            precioNeto: precioNeto,
+            contacto: 'Demo Contact',
+            correo: 'contacto@demo.edu.mx',
+            lastTouch: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
+            createdAt: new Date(Date.now() - 100 * 24 * 60 * 60 * 1000).toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+        
+        school.alumnos_periodo = calcAlumnosPeriodo(school.alumnosTotales, school.periodicidad);
+        currentTotal += calcVentaProyectada(school);
+        mockSchools.push(school);
+    }
+
+    // Adjust last few to hit the goal roughly if needed (or just leave it random)
+    console.log(`[DEMO SEED] Generated ${mockSchools.length} schools. Total Projected: ${formatCurrency(currentTotal)}`);
+    localStorage.setItem('rprodash_schools', JSON.stringify(mockSchools));
+}
+
+// Auto-seed on load
+seedDemoData();
 
 function initParticles(canvasId, glowColor = '#0a84ff') {
     const canvas = document.getElementById(canvasId);
